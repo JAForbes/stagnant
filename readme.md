@@ -65,7 +65,7 @@ async function main(trace){
         select expensive_query()
     `)
     
-    // trace is always async to avoid Zalgo
+    // trace is async by default to avoid Zalgo
     const file = await trace( () => fs.promises.readFile('package.json', 'utf8') )
 
     // for sync code, use trace.sync
