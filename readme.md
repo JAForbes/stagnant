@@ -255,6 +255,12 @@ It is a sensible default.
 
 All signs point to no.
 
+### How do I continue a trace across multiple servers or contexts?
+
+In your `onevent` callback, pass in your own `parentId` or `traceId` from a previous request.  When stagnant creates what it thinks is the root trace, it will leave the `parentId` property null.  You can use that fact to conditionally add a differnt `parentId` from a previous request.
+
+See the [honeycomb implementation](./honeycomb.js) for ideas.
+
 ## Honeycomb integration
 
 Stagnant can be used offline and with any 3rd party instrumentation toolkit you prefer to use.  I originally wrote this tool as I was continually having issues with the official node.js honeycomb beeline library.  I was often getting issues with missing traces, and missing parent spans and I couldn't figure it out.  After spending a lot of time on it, I figured it was easier to just write an adpater that is 100% explicit and doesn't rely on Node's [async_hooks](https://nodejs.org/api/async_hooks.html) module.
@@ -262,4 +268,3 @@ Stagnant can be used offline and with any 3rd party instrumentation toolkit you 
 So here we are.  I share with you the same integration just in case it is useful for to you.  But stagnant can be used as a standalone library just as easily.
 
 There is a simple [honeycomb](honeycomb.io) integration in `stagnant/honeycomb.js`.  Check out the [usage script](./honeycomb-usage.js) to set it up in your own project.
-
