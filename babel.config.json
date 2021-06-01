@@ -13,13 +13,5 @@
 				"corejs": "3.6.5"
 			}
 		]
-	],
-	"plugins": [
-		[
-			"@babel/plugin-proposal-class-properties",
-			{
-				"loose": true
-			}
-		]
 	]
 }

@@ -4,23 +4,24 @@ Measure your slow code, make it _fast_.
 
 > ⚠ This package is not stable at all, do not rely on it.
 
-## Why?
+## What
 
-- inferred traces from async stacks are buggy
-- `console.time` has global label state and can have name collisions
-- instrumenting code should follow the interpreter pattern so you can decide where the data goes later
-- encourage writing fast code
+- A JS instrumentation library for measuring execution time
+- No inference, 100% explicit instrumentation
+- Easy to use integrate any 3rd party metrics service
+- Zero dependencies
+- Example honeycomb integration OOTB
 
 ## Quick Start
 
 - npm install `stagnant`
 
 ```js
-const trace = require('stagnant')
+import trace from 'stagnant'
 
 const traceOptions = {
     onevent({ id, name, data, parentId, startTime, endTime }){
-        console.log('profit')
+        console.log(name, endTime - startTime)
     },
 
     // Advanced Options:
@@ -57,7 +58,7 @@ async function main(){
 
 ```js
 
-const P = require('stagnant')
+import P from 'stagnant'
 
 async function main(trace){
 
