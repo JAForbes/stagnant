@@ -2,7 +2,7 @@
   "name": "stagnant",
   "version": "0.0.3",
   "description": "",
-  "main": "dist/stagnant.umd.js",
+  "main": "index.cjs",
   "module": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

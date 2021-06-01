@@ -1,3 +1,7 @@
+# Build Output
+dist
+*.cjs
+
 # Logs
 logs
 *.log

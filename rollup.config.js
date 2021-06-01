@@ -30,4 +30,28 @@ export default [
             ,sourcemap: true
         }
     }
+    ,{
+        plugins: [
+            common()
+            ,resolve()
+        ]
+        ,input: './honeycomb.js'
+        ,output: {
+            format: 'cjs'
+            ,file: './honeycomb.cjs'
+            ,sourcemap: true
+        }
+    }
+    ,{
+        plugins: [
+            common()
+            ,resolve()
+        ]
+        ,input: './index.js'
+        ,output: {
+            format: 'cjs'
+            ,file: './index.cjs'
+            ,sourcemap: true
+        }
+    }
 ]
