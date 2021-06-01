@@ -1,6 +1,6 @@
 {
   "name": "stagnant",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "",
   "main": "dist/stagnant.umd.js",
   "module": "index.js",
