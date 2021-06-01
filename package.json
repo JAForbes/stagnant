@@ -2,10 +2,14 @@
   "name": "stagnant",
   "version": "0.0.2",
   "description": "",
-  "main": "index.js",
-  "type": "module",
+  "main": "dist/stagnant.umd.js",
+  "module": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublish": "rollup -c"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   },
   "author": "",
   "license": "MIT",
@@ -14,8 +18,13 @@
     "@babel/eslint-parser": "^7.14.4",
     "@babel/eslint-plugin": "^7.13.16",
     "@babel/preset-env": "^7.14.4",
+    "@rollup/plugin-commonjs": "^19.0.0",
+    "@rollup/plugin-node-resolve": "^13.0.0",
     "dotenv": "^10.0.0",
     "eslint": "^7.27.0",
-    "nodemon": "^2.0.7"
+    "nodemon": "^2.0.7",
+    "rollup": "^2.50.5",
+    "rollup-plugin-gzip": "^2.5.0",
+    "rollup-plugin-terser": "^7.0.2"
   }
 }
