@@ -80,7 +80,7 @@ async function main(trace){
     })
 
     // create child traces, great for modelling the callstack
-    await trace.child('somethingElse', p => 
+    await trace('somethingElse', p => 
         somethingElse(p)
     )
 
