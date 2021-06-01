@@ -289,7 +289,7 @@ All signs point to no.
 
 ### How do I continue a trace across multiple servers or contexts?
 
-In your `onevent` callback, pass in your own `parentId` or `traceId` from a previous request.  When stagnant creates what it thinks is the root trace, it will leave the `parentId` property null.  You can use that fact to conditionally add a differnt `parentId` from a previous request.
+In your `onevent` callback, pass in your own `parentId` or `traceId` from a previous request.  When stagnant creates what it thinks is the root trace, it will leave the `parentId` property null.  You can use that fact to conditionally add a different `parentId` from a previous request.
 
 See the [honeycomb implementation](./honeycomb.js) for ideas.
 
