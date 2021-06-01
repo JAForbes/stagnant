@@ -1,5 +1,5 @@
 /* globals console, setTimeout, process */
-import Honey from './honeycomb'
+import Honey from './honeycomb.js'
 
 function delay(ms){
     return new Promise( Y => setTimeout(Y, ms))

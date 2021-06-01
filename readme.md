@@ -295,6 +295,10 @@ See the [honeycomb implementation](./honeycomb.js) for ideas.
 
 ## Honeycomb integration
 
+![A visualization of a call graph as measured by stagnant using the honeycomb integration.](./assets/honeycomb-usage.png)
+ 
+*A visualization of a call graph as measured by `stagnant` using the honeycomb integration.*
+
 Stagnant can be used offline and with any 3rd party instrumentation toolkit you prefer to use.  I originally wrote this tool as I was continually having issues with the official node.js honeycomb beeline library.  I was often getting issues with missing traces, and missing parent spans and I couldn't figure it out.  After spending a lot of time on it, I figured it was easier to just write an adpater that is 100% explicit and doesn't rely on Node's [async_hooks](https://nodejs.org/api/async_hooks.html) module.
 
 So here we are.  I share with you the same integration just in case it is useful for to you.  But stagnant can be used as a standalone library just as easily.
