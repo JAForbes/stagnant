@@ -299,4 +299,4 @@ Stagnant can be used offline and with any 3rd party instrumentation toolkit you 
 
 So here we are.  I share with you the same integration just in case it is useful for to you.  But stagnant can be used as a standalone library just as easily.
 
-There is a simple [honeycomb](honeycomb.io) integration in `stagnant/honeycomb.js`.  Check out the [usage script](./honeycomb-usage.js) to set it up in your own project.
+There is a simple [honeycomb](https://honeycomb.io) integration in [`stagnant/honeycomb.js`](./honeycomb.js).  Check out the [usage script](./honeycomb-usage.js) to set it up in your own project.
