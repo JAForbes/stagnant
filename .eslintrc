@@ -61,9 +61,6 @@
 		"array-callback-return": [
 			"error"
 		],
-		"callback-return": [
-			"error"
-		],
 		"max-depth": [
 			"warn",
 			4

@@ -127,7 +127,60 @@ main(trace).finally( () => {
 
 ### stagnant
 
-`stagnant({ options: stagnant.Options }) -> Trace`
+`stagnant(options: stagnant.Options ) -> Trace`
+
+### Trace
+
+`Trace` is often aliased as `p` (for profile).  Usually you invoke trace with a callback.  stagnant
+will time how long it takes for a promise returned from that callback to settle.
+
+```js
+const p = stagnant(options)
+
+let output = await p( () => myAsyncFunction() )
+```
+
+You can also measure a synchronous function
+
+```js
+let output = p.sync( () => mySynchronousFunction() )
+```
+You can attach data to the current event and any child events via `trace( data )`.
+
+```js
+// all child events will have the url and method property attached to event.data
+p({ url, method })
+```
+
+You can also pass in data when setting up a callback to be traced:
+
+```js
+p({ url, method }, () => callEndpoint() )
+```
+
+By default `stagnant` will name the event using the `Function::toString()` method of your callback.  But you can explicitly name an event as well via two approaches.
+
+1. Passing a string as the first argument
+2. Including a `name` attribute on the event data object
+
+```js
+// string as first arg
+p('call the endpoint', { url, method }, () => callEndpoint())
+
+// name attribute on the data object
+p({ name: 'call the endpoint', url, method }, () => callEndpoint())
+```
+
+
+When you are done measuring your code call `trace.flush` to signal to stagnant that the trace is over.
+
+
+```js
+await p.flush()
+```
+
+It's best to not use `p` after calling flush as the total duration of rootEvent will be less than the summed duration of any child events... which would be weird.
+
 
 ### stagnant.Options
 
@@ -153,17 +206,21 @@ Dispatched whenever a callback does not throw an exception.
 
 `async onerror( event: ErrorEvent ) -> void`
 
-
 Dispatched whenever a callback throws an exception.
+#### onflush
+
+`async onflush( event: RootEvent ) -> void`
+
+Dispatched `.flush()` is called on the root trace.  Calling `flush` implies the end of the parent trace.  This is helpful for measuring overall run time of a trace.
 
 ## Event
 
 ```typescript
 {
-    // id of the parent trace
+    // id of the parent event
     parentId: string
 
-    // reference to the parent trace
+    // reference to the parent event
     , parent: Trace
 
     // id of the current event 
@@ -172,7 +229,7 @@ Dispatched whenever a callback throws an exception.
     // event metadata, just a state bag with no schema
     , data: any
 
-    // time is represented as a millisecond unix timestagnant
+    // time is represented as a millisecond unix timestamp
     , startTime: number
     , endTime: number
 }
@@ -194,50 +251,15 @@ It helps capture absolutely everything safely.  Everything that is measured can 
 
 It is a sensible default.
 
-For just measuring "something happened" there is `trace.marker(label)`
+### But won't using anonymous functions introduce signifcantly delays?
+
+All signs point to no.
 
 ## Honeycomb integration
 
-```js
-const stagnant = require('stagnant')
+Stagnant can be used offline and with any 3rd party instrumentation toolkit you prefer to use.  I originally wrote this tool as I was continually having issues with the official node.js honeycomb beeline library.  I was often getting issues with missing traces, and missing parent spans and I couldn't figure it out.  After spending a lot of time on it, I figured it was easier to just write an adpater that is 100% explicit and doesn't rely on Node's [async_hooks](https://nodejs.org/api/async_hooks.html) module.
 
-const Honeycomberino = ({ write_key, dataset, service_name, url }) => {
-    function startTrace(options){
-        const root = stagnant({
-            async onevent({ parentId, id, name, startTime, endTime }){
+So here we are.  I share with you the same integration just in case it is useful for to you.  But stagnant can be used as a standalone library just as easily.
 
-                const honeycombEvent = {
-                    name
-                    // stagnant just thinks in terms of events
-                    // where events can have children events
-                    // honeycomb has a notion of spans and traces
-                    // a trace contains spans
-                    , 'trace.span_id': 'span-' + id
-                    , 'trace.trace_id': 'trace-'+ id
-                    , 'trace.parent_id': 'span-' + parentId
-                    , service_name
-                    , duration_ms: endTime - startTime
-                    , timestagnant: startTime
-                }
+There is a simple [honeycomb](honeycomb.io) integration in `stagnant/honeycomb.js`.  Check out the [usage script](./honeycomb-usage.js) to set it up in your own project.
 
-                await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content Type': 'application/json',
-                        'Authorization': 'Bearer ' + write_key
-                    },
-                    body: JSON.stringify(honeycombEvent)
-                })
-            }
-            ,...options
-        })
-
-        return root
-    } 
-
-    return startTrace
-}
-
-
-H = Honeycomberino({ apiKey: '...' })
-```
