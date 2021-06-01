@@ -71,7 +71,7 @@ async function main(trace){
     // for sync code, use trace.sync
     trace.sync( () => 2 + 2 )
 
-    // add a meaninful name when the inferred name won't do 
+    // add a meaningful name when the inferred name won't do 
     trace.sync('sequence loop', () => {
 
         for( let x of sequence() ) {
