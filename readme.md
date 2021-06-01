@@ -16,25 +16,39 @@ Measure your slow code, make it _fast_.
 - npm install `stagnant`
 
 ```js
-const P = require('stagnant')
+const trace = require('stagnant')
+
+const traceOptions = {
+    onevent({ id, name, data, parentId, startTime, endTime }){
+        console.log('profit')
+    },
+
+    // Advanced Options:
+    //
+    // onerror(){},
+    // onsuccess(){},
+    // onflush(){},
+    // generateId(){},
+    // traceId,
+    // parentId
+}
 
 async function main(){
-    const root = P()
+    const span = trace(traceOptions)
 
     const package = 
-        await root( () => fs.promises.readFile('package.json', 'utf8') )
+        await span( () => fs.promises.readFile('package.json', 'utf8') )
 
     const files = 
-        await root( 'ls', () => fs.promises.readdir('.') )
+        await span( 'ls', () => fs.promises.readdir('.') )
 
     for( let file of files ) {
-        const filedata = root.traceSync( () =>
+        const filedata = span.sync( 'read file: ' + file,  () =>
             fs.readFileSync(file)
         )
     }
     
-    root.events[0]
-    //=> { parentId: 1, id: 2, name: 'fs.promises.readFile(...)', data: null }
+    await span.flush()
 }
 ```
 
@@ -57,21 +71,21 @@ async function main(trace){
     // for sync code, use trace.sync
     trace.sync( () => 2 + 2 )
 
-    // you can manually start and end a trace
-    // when absolutely required, but make sure you handle errors!
-    let x = trace.start('sequence loop')
-    for( let x of sequence() ) {
-        someSyncCode(x)
-    }
-    x.end()
+    // add a meaninful name when the inferred name won't do 
+    trace.sync('sequence loop', () => {
+
+        for( let x of sequence() ) {
+            someSyncCode(x)
+        }
+    })
 
     // create child traces, great for modelling the callstack
-    const child = trace.child('somethingElse')
+    await trace.child('somethingElse', p => 
+        somethingElse(p)
+    )
 
-    await trace( ({ p }) => somethingElse(p) )
 
-    // you can inspect the trace data at any time
-    child.events[0]
+    await trace.flush()
 }
 
 async function somethingElse(trace){
@@ -100,7 +114,13 @@ async function somethingElse(trace){
     return true
 }
 
+
+const events = []
 const options = {
+    onevent(event){
+        // capture all events
+        events.push(event)
+    },
     async onsuccess({ name, parentId, id, data, startTime, endTime }){
         console.log(startTime, name, 'duration:', endTime - startTime )
     },
@@ -116,7 +136,7 @@ const trace = P(options)
 
 main(trace).finally( () => {
     // all events ready to inspect
-    trace.events
+    events
 
     // we've also been logging our events as they happened
     // we could be sending them to a tracing API if we prefer
@@ -171,6 +191,18 @@ p('call the endpoint', { url, method }, () => callEndpoint())
 p({ name: 'call the endpoint', url, method }, () => callEndpoint())
 ```
 
+You can create detailed call graphs by taking advantage of the child span constructor passed in to all callbacks:
+
+```js
+
+p( 'outer', p => 
+    p('inner', p => 
+        p('core', () => ... )
+    )
+)
+```
+
+Each event will have a `parentId` set to the `id` of the previous event.  This is great for explicitly modelling async call stacks.
 
 When you are done measuring your code call `trace.flush` to signal to stagnant that the trace is over.
 
