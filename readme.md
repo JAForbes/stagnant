@@ -10,7 +10,34 @@ Measure your slow code, make it _fast_.
 - No inference, 100% explicit instrumentation
 - Easy to use integrate any 3rd party metrics service
 - Example honeycomb integration OOTB
+- Browser = 0 Dependencies
+- Server = 1 Polyfill (node-fetch)
 - Runs in the [Browser](https://flems.io/#0=N4IgZglgNgpgziAXAbVAOwIYFsZJAOgAsAXLKEAGhAGMB7NYmBvEAXwvW10QICsEqdBk2J4A9ACoABAHMotAEYYocKULi1YFKXBjEAKhBy0ArsW0AHAE61q8VRLEAdNGBNpqxCPSkATGFAYAJ4AFFhwAJTALlKxUlZ6JlZoUmgwAO5SAAo2WBC6IVIAmlIAvAB8OnqGxmYhRdrhEREurC4ubh5ePlYYaL60WAAiAcFhEGilAAyNGAAepQDMU1NRMXEJxEkp-oGheSkA1FIAshjEhPi9-YMhEVLSWPNSALRSBy1obWguGHBBHiknU83hSFgwVl0AFEAG4iO7RFJxDDpDAQYjxPoDYajUKfb5-AHUIHuEE+OFWCBgIJZCHYOAI9axMC0KyFWAYiBlKRTADcUi5AB4pABGGAAVn5XMOh3uiLiCtO50u12xdyZUm+BP+gOB3RS1GUUAAajBKZAYL4QjA4Qw1kjYuoMcApBZNdybSINRYQi6AOQaHAAYSNpvNEEtQ3OGD9iCki01nw1noY3Is+B11EKdzKlQpVJpdPC1ttxHunwVTqkpgxpSkKLRGJ9Un9hqgUCjxBjcYALJrtDmKmojSWROWNZtttWzK12phMySuqDh+3R3b5cjUejMTccXt1V854TdaT9Tou-0Ib4AErwExQYiMh31rcY1WDEb7-G-Bd65eQB8zVvOB72IBl7QVBtt3fPcxm-H55yJRcyRSABVOAMBkGAn0reg4Cbbl8MwzAGF9DUFXoFNHxdTAcG0JhfBqGBtCIqwDCMGBEw3RU4gGagTBwBh8AUWhfCCfAJjSKwAAl9BOAAZKRDjrEJyJ4qQAANBQscoABJgFoziAB8jKkP1iFoLsoD9VgpH0himNec8IXYnBWEFMQdI0tSFQrdTvgVVgk2fDkpCo7lgACuJwrrKCm0KP1wUhGBYREP1tH9JLoVLTsMHwGA5mwCxYFjKQACZ+ykQdKiylLSzXMspD82JQoSECH25OLXUKN0hzbE0zSpCMrRdfAxqoyxEyaic7w62LX26qr7iHIjLysG9ZsfCb4k28dnza0DOoW5tqqBaBGCsYDQIZbaDofPbvXwMAoBMOBCAPBVJ2SHb2uIWcEPQzDsM+fBDWIah3rC3MWw1dRNBgfKrBsNkYGa10bDsOA4HyuZ0RCEV8WCygQF0WAUIQHgexFRAADYRTYDgQEMvBQax4mhEYZgeDYABdKgoAmABrCnUCZrg8CImQSNEKgknIHgSGICw4EQMQxHcCxBZkUHBjESXpYAASmfBjcWMRfHyYg9a7KW+mIfABN8fB+GJ4gggsbgSeoSkLFEVgedYIA) and the [Server](https://runkit.com/jaforbes/stagnant-server-side-usage)
+
+## Builds
+
+### Browser
+
+Stagnant is built to be trace performance across the entire stack.  You can begin a trace client side, continue tracing within the server and then pick up the trace client side again.
+
+This makes it possible to get far deeper insights into what is causing your Time to Interactive (TTI) and Time to Load (TTL) to slow down.
+
+The browser version of stagnant has no dependencies, it simply uses the native fetch module to call out to honeycomb for each event.  The node version uses the same code but relies on the `node-fetch` polyfill.
+
+- Minified UMD Stagnant Honeycomb Module 
+- UMD Stagnant Honeycomb Module
+- Minified UMD Stagnant Module 
+- UMD Stagnant Module
+
+### Node.js
+
+Depending on your project structure node.js will either import the native ESM module or the CJS build automatically.
+
+- Native ESM Stagnant Module
+- CJS Stagnant Bundle
+
+- Native ESM Stagnant Honeycomb Module
+- CJS Stagnant Honeycomb Bundle
 
 ## Quick Start
 
