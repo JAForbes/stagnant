@@ -156,6 +156,16 @@ function Main(config={}){
     return handlerInstance
 }
 
+/**
+ * Safely invoke a callback even if trace is null.
+ * 
+ * useful when there are multiple entry points into a function and some are not
+ * passing in a trace.
+ * 
+ * @param {*} trace 
+ * @param  {...any} args 
+ * @returns 
+ */
 function call(trace, ...args){
     const cb = args.find( x => typeof x == 'function' )
 
