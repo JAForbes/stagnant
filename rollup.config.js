@@ -5,6 +5,7 @@ import resolve from '@rollup/plugin-node-resolve'
 import {terser} from 'rollup-plugin-terser'
 
 cp.execSync('rm -rf dist')
+cp.execSync('rm *.cjs')
 
 const entries = [
     ['index.js', 'stagnant']
@@ -26,6 +27,10 @@ const config = formats.map(
             common()
             ,resolve()
         ]
+
+        if( format == 'cjs' ) {
+            outputName = path.basename(input, '.js')
+        }
 
         const filename = outputName + extension
 
