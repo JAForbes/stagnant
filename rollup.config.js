@@ -1,74 +1,52 @@
+import path from 'path'
 import common from '@rollup/plugin-commonjs'
 import resolve from '@rollup/plugin-node-resolve'
 import {terser} from 'rollup-plugin-terser'
 
-export default [
-    {
-        plugins: [
-            common()
-            ,resolve()
-        ]
-        ,input: './index.js'
-        ,output: {
-            name: 'stagnant'
-            ,format: 'umd'
-            ,file: './dist/stagnant.umd.js'
-            ,sourcemap: true
-        }
-    }
-    ,{
-        plugins: [
-            common()
-            ,resolve()
-            ,terser()
-        ]
-        ,input: './index.js'
-        ,output: {
-            name: 'stagnant'
-            ,format: 'umd'
-            ,file: './dist/stagnant.umd.min.js'
-            ,sourcemap: true
-        }
-    }
-    ,{
-        plugins: [
-            common()
-            ,resolve()
-            ,terser()
-        ]
-        ,external: [
-            'node-fetch'
-        ]
-        ,input: './index.js'
-        ,output: {
-            name: 'stagnant'
-            ,format: 'umd'
-            ,file: './dist/stagnant-honey.browser.min.js'
-            ,sourcemap: true
-        }
-    }
-    ,{
-        plugins: [
-            common()
-            ,resolve()
-        ]
-        ,input: './honeycomb.js'
-        ,output: {
-            format: 'cjs'
-            ,file: './honeycomb.cjs'
-            ,exports: 'default'
-        }
-    }
-    ,{
-        plugins: [
-            common()
-            ,resolve()
-        ]
-        ,input: './index.js'
-        ,output: {
-            format: 'cjs'
-            ,file: './index.cjs'
-            ,exports: 'default'
-        }
-    }
+const entries = [
+    'index.js'
+    ,'honeycomb.js'
 ]
+
+const formats = entries.flatMap(
+    input => [
+        { format: 'umd', dir: './dist', extension: '.browser.js', sourcemap: true, input, plugins: [] }
+        , { format: 'umd', dir: './dist', extension: '.browser.min.js', sourcemap: true, input, plugins: [terser()] }
+        , { format: 'cjs', dir: './', extension: '.cjs', sourcemap: false, input, plugins: [] }
+    ]
+)
+
+const config = formats.map( 
+    ({ format, dir, extension, sourcemap, input, plugins }) => {
+
+        const defaultPlugins = [
+            common()
+            ,resolve()
+        ]
+
+        const rawFilename = path.basename(input, '.js')
+        const filename = rawFilename + extension
+
+        const config = {
+            plugins: defaultPlugins.concat(plugins)
+            ,input
+            ,external: format == 'umd' ? [
+                'node-fetch'
+            ] : []
+            ,output: {
+                name: format == 'umd' ? 'stagnant' : undefined
+                ,globals: format == 'umd' ? {
+                    'node-fetch': 'fetch'
+                } : {}
+                ,sourcemap
+                ,format
+                ,file: path.resolve(dir, filename)
+                ,exports: 'default'
+            }
+        }
+
+        return config
+    }
+)
+
+export default config
