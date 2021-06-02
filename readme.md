@@ -318,7 +318,7 @@ Short answer, you don't.
 
 Long answer, instead of directly calling the 3rd party library, call your own function that calls the library and time that.
 
-You can use `stagnant.call( p, () => ...)` instead if `p( () => ... )` to safe guard against not having a trace variable.
+You can use `stagnant.call( p, () => ...)` instead of `p( () => ... )` to safe guard against not having a trace variable.
 
 If the trace: `p` is undefined, `stagnant` will just invoke the callback without creating a trace.  That way you can write code that will behave just fine even if there is no trace variable passed down.  This also means you can disable tracing in your codebase without having to restructure your code beyond not passing down a trace at the entry point.
 
