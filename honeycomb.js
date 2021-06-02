@@ -33,7 +33,7 @@ export default function Honey({
                 , duration_ms: event.endTime - event.startTime
             })
 
-            const response = await fetch(`https://api.honeycomb.io/1/events/${dataset}`, {
+            await fetch(`https://api.honeycomb.io/1/events/${dataset}`, {
                 method: 'post'
                 ,headers: {
                     'X-Honeycomb-Team': writeKey
@@ -43,7 +43,6 @@ export default function Honey({
                 ,body
             })
 
-            console.log(response.status, event.name)
         }
     })
 
