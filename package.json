@@ -11,6 +11,12 @@
   "engines": {
     "node": ">=14.0.0"
   },
+  "files": [
+    "dist/*",
+    "index.js",
+    "honeycomb.js",
+    "*.cjs"
+  ],
   "author": "",
   "license": "MIT",
   "devDependencies": {
