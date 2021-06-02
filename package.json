@@ -26,5 +26,8 @@
     "rollup": "^2.50.5",
     "rollup-plugin-gzip": "^2.5.0",
     "rollup-plugin-terser": "^7.0.2"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.1"
   }
 }
