@@ -1,7 +1,10 @@
 import path from 'path'
+import cp from 'child_process'
 import common from '@rollup/plugin-commonjs'
 import resolve from '@rollup/plugin-node-resolve'
 import {terser} from 'rollup-plugin-terser'
+
+cp.execSync('rm -rf dist')
 
 const entries = [
     ['index.js', 'stagnant']
