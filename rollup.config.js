@@ -39,7 +39,6 @@ export default [
         ,output: {
             format: 'cjs'
             ,file: './honeycomb.cjs'
-            ,sourcemap: true
         }
     }
     ,{
@@ -51,7 +50,6 @@ export default [
         ,output: {
             format: 'cjs'
             ,file: './index.cjs'
-            ,sourcemap: true
         }
     }
 ]
