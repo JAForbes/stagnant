@@ -12,15 +12,15 @@ const entries = [
 ]
 
 const formats = entries.flatMap(
-    ([input,output]) => [
-        { format: 'umd', dir: './dist', extension: '.browser.js', sourcemap: true, input, output, plugins: [] }
-        , { format: 'umd', dir: './dist', extension: '.browser.min.js', sourcemap: true, input, output, plugins: [terser()] }
-        , { format: 'cjs', dir: './', extension: '.cjs', sourcemap: false, input, output, plugins: [] }
+    ([input,outputName]) => [
+        { format: 'umd', dir: './dist', extension: '.browser.js', sourcemap: true, input, outputName, plugins: [] }
+        , { format: 'umd', dir: './dist', extension: '.browser.min.js', sourcemap: true, input, outputName, plugins: [terser()] }
+        , { format: 'cjs', dir: './', extension: '.cjs', sourcemap: false, input, outputName, plugins: [] }
     ]
 )
 
 const config = formats.map( 
-    ({ format, dir, extension, sourcemap, input, output: outputName, plugins }) => {
+    ({ format, dir, extension, sourcemap, input, outputName, plugins }) => {
 
         const defaultPlugins = [
             common()
