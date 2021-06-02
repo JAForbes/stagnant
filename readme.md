@@ -14,6 +14,8 @@ Measure your slow code, make it _fast_.
 
 ## Builds
 
+You can view all the latest builds on unpkg [here](https://unpkg.com/browse/stagnant@latest/dist/).
+
 ### Browser
 
 Stagnant is built to be trace performance across the entire stack.  You can begin a trace client side, continue tracing within the server and then pick up the trace client side again.
@@ -22,20 +24,20 @@ This makes it possible to get far deeper insights into what is causing your Time
 
 The browser version of stagnant has no dependencies, it simply uses the native fetch module to call out to honeycomb for each event.  The node version uses the same code but relies on the `node-fetch` polyfill.
 
-- Minified UMD Stagnant Honeycomb Module 
-- UMD Stagnant Honeycomb Module
-- Minified UMD Stagnant Module 
-- UMD Stagnant Module
+- [Minified UMD Stagnant Honeycomb Module]((https://unpkg.com/browse/stagnant@0.0.8/dist/stagnant-honeycomb.browser.min.js))
+- [UMD Stagnant Honeycomb Module](https://unpkg.com/browse/stagnant@0.0.8/dist/stagnant-honeycomb.browser.js)
+- [Minified UMD Stagnant Module]((https://unpkg.com/browse/stagnant@0.0.8/dist/stagnant.browser.min.js)) 
+- [UMD Stagnant Module](https://unpkg.com/browse/stagnant@0.0.8/dist/stagnant.browser.js)
 
 ### Node.js
 
 Depending on your project structure node.js will either import the native ESM module or the CJS build automatically.
 
-- Native ESM Stagnant Module
-- CJS Stagnant Bundle
+- Native ESM Stagnant Module: `import stagnant from 'stagnant'`
+- CJS Stagnant Bundle: `const stagnant = require('stagnant')`
 
-- Native ESM Stagnant Honeycomb Module
-- CJS Stagnant Honeycomb Bundle
+- Native ESM Stagnant Honeycomb Module: `import stagnant from 'stagnant/honeycomb.js'`
+- CJS Stagnant Honeycomb Bundle: `const stagnant = require('stagnant/honeycomb')`
 
 ## Quick Start
 

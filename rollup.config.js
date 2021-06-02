@@ -4,28 +4,27 @@ import resolve from '@rollup/plugin-node-resolve'
 import {terser} from 'rollup-plugin-terser'
 
 const entries = [
-    'index.js'
-    ,'honeycomb.js'
+    ['index.js', 'stagnant']
+    ,['honeycomb.js', 'stagnant-honeycomb']
 ]
 
 const formats = entries.flatMap(
-    input => [
-        { format: 'umd', dir: './dist', extension: '.browser.js', sourcemap: true, input, plugins: [] }
-        , { format: 'umd', dir: './dist', extension: '.browser.min.js', sourcemap: true, input, plugins: [terser()] }
-        , { format: 'cjs', dir: './', extension: '.cjs', sourcemap: false, input, plugins: [] }
+    ([input,output]) => [
+        { format: 'umd', dir: './dist', extension: '.browser.js', sourcemap: true, input, output, plugins: [] }
+        , { format: 'umd', dir: './dist', extension: '.browser.min.js', sourcemap: true, input, output, plugins: [terser()] }
+        , { format: 'cjs', dir: './', extension: '.cjs', sourcemap: false, input, output, plugins: [] }
     ]
 )
 
 const config = formats.map( 
-    ({ format, dir, extension, sourcemap, input, plugins }) => {
+    ({ format, dir, extension, sourcemap, input, output: outputName, plugins }) => {
 
         const defaultPlugins = [
             common()
             ,resolve()
         ]
 
-        const rawFilename = path.basename(input, '.js')
-        const filename = rawFilename + extension
+        const filename = outputName + extension
 
         const config = {
             plugins: defaultPlugins.concat(plugins)
