@@ -1,7 +1,7 @@
 # Build Output
 dist
 *.cjs
-
+*.map
 # Logs
 logs
 *.log
