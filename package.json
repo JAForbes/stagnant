@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.cjs",
   "module": "index.js",
+  "browser": "dist/stagnant.browser.min.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepublish": "rollup -c"
