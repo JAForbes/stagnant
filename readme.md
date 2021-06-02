@@ -178,6 +178,12 @@ main(trace).finally( () => {
 
 `stagnant(options: stagnant.Options ) -> Trace`
 
+Initialize a trace.
+### stagnant.call
+
+`stagnant.call( trace?, ...args, () -> b ) -> b`
+
+Safely invoke a trace callback even if the trace is null.  Fairly useful for writing wrappers around 3rd party libraries that may be invoked by code without a trace variable.
 ### Trace
 
 `Trace` is often aliased as `p` (for profile).  Usually you invoke trace with a callback.  stagnant
@@ -305,6 +311,31 @@ Event & { error: Error }
 Just like an event, but with an error attached.  This will be dispatched to your callback whenever a callback throws an exception.
 
 ## FAQ
+
+### How do I instrument 3rd party libraries if everything is explicit?
+
+Short answer, you don't.  
+
+Long answer, instead of directly calling the 3rd party library, call your own function that calls the library and time that.
+
+You can use `stagnant.call( p, () => ...)` instead if `p( () => ... )` to safe guard against not having a trace variable.
+
+If the trace: `p` is undefined, `stagnant` will just invoke the callback without creating a trace.  That way you can write code that will behave just fine even if there is no trace variable passed down.  This also means you can disable tracing in your codebase without having to restructure your code beyond not passing down a trace at the entry point.
+
+```js
+const P = require('stagnant')
+
+function query(query, values, p=null){
+    const results = await P.call(p, () => db.query(query,values))
+    return results
+}
+
+// this will not perform a trace
+await query('select * from users where user_id = ? ', [1], null)
+
+// this will perform a span within the active trace
+await query('select * from users where user_id = ? ', [1], p)
+```
 
 ### Why use callbacks for everything
 

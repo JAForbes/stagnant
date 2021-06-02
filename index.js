@@ -156,4 +156,17 @@ function Main(config={}){
     return handlerInstance
 }
 
+function call(trace, ...args){
+    const cb = args.find( x => typeof x == 'function' )
+
+    if ( trace ) {
+        return trace( ...args )
+    } else if ( cb ) {
+        return cb( (...args) => call(null, ...args) )
+    }
+    return null
+}
+
+Main.call = call
+
 export default Main

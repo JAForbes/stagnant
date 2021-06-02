@@ -4,8 +4,8 @@ import common from '@rollup/plugin-commonjs'
 import resolve from '@rollup/plugin-node-resolve'
 import {terser} from 'rollup-plugin-terser'
 
-cp.execSync('rm -rf dist')
-cp.execSync('rm *.cjs')
+cp.execSync('rm -rf dist || true')
+cp.execSync('rm *.cjs || true')
 
 const entries = [
     ['index.js', 'stagnant']
