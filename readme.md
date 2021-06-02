@@ -18,7 +18,7 @@ You can view all the latest builds on unpkg [here](https://unpkg.com/browse/stag
 
 ### Browser
 
-Stagnant is built to be trace performance across the entire stack.  You can begin a trace client side, continue tracing within the server and then pick up the trace client side again.
+Stagnant is built to trace performance across the entire stack.  You can begin a trace client side, continue tracing within the server and then pick up the trace client side again.
 
 This makes it possible to get far deeper insights into your Time to Interactive (TTI) and Time to Load (TTL).
 
