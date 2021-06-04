@@ -18,7 +18,7 @@ You can view all the latest builds on unpkg [here](https://unpkg.com/browse/stag
 
 ### Browser
 
-Stagnant is built to be trace performance across the entire stack.  You can begin a trace client side, continue tracing within the server and then pick up the trace client side again.
+Stagnant is built to trace performance across the entire stack.  You can begin a trace client side, continue tracing within the server and then pick up the trace client side again.
 
 This makes it possible to get far deeper insights into your Time to Interactive (TTI) and Time to Load (TTL).
 
@@ -326,7 +326,7 @@ Short answer, you don't.
 
 Long answer, instead of directly calling the 3rd party library, call your own function that calls the library and time that.
 
-You can use `stagnant.call( p, () => ...)` instead if `p( () => ... )` to safe guard against not having a trace variable.
+You can use `stagnant.call( p, () => ...)` instead of `p( () => ... )` to safe guard against not having a trace variable.
 
 If the trace: `p` is undefined, `stagnant` will just invoke the callback without creating a trace.  That way you can write code that will behave just fine even if there is no trace variable passed down.  This also means you can disable tracing in your codebase without having to restructure your code beyond not passing down a trace at the entry point.
 
