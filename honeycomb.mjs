@@ -13,6 +13,7 @@ export default function Honey({
     , traceId= Math.random().toString(15).slice(2,8)
     , parentId= undefined
     , data={} 
+    , config={}
 }={}){
 
     // Traces aren't nested, but a trace can contain nested spans.
@@ -34,18 +35,28 @@ export default function Honey({
                 , duration_ms: event.endTime - event.startTime
             })
 
-            // console.log(name, event.error, event.endTime - event.startTime)
-            await fetch(`https://api.honeycomb.io/1/events/${dataset}`, {
-                method: 'post'
-                ,headers: {
-                    'X-Honeycomb-Team': writeKey
-                    ,'X-Honeycomb-Event-Time': event.startTime
-                    ,'Content-Type': 'application/json'
+            try {
+
+                // console.log(name, event.error, event.endTime - event.startTime)
+                const response = await fetch(`https://api.honeycomb.io/1/events/${dataset}`, {
+                    method: 'post'
+                    ,headers: {
+                        'X-Honeycomb-Team': writeKey
+                        ,'X-Honeycomb-Event-Time': event.startTime
+                        ,'Content-Type': 'application/json'
+                    }
+                    ,body
+                })
+                root.config.console.log(response.status)
+                if( !event.parentId ) {
+                    root.config.console.log('flushed', response.status )
                 }
-                ,body
-            })
+            } catch (e) {
+                root.config.console.error(e)
+            }
 
         }
+        , ...config
     })
 
     return root

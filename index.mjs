@@ -4,10 +4,22 @@ function defaultConfig(){
     function onerror(){}
     function onsuccess(){}
     function onflush(){}
+    
+    // eslint-disable-next-line no-undef
+    
+    const ourConsole = {
+        log(){},
+        error(){},
+        warn(){}
+    }
+
     function generateId(){
         return Math.random().toString(15).slice(2,8)
     }
-    return { onevent, onerror, onsuccess, onflush, generateId }
+
+    return { 
+        onevent, onerror, onsuccess, onflush, console: ourConsole, generateId 
+    }
 }
 
 function Main(config={}){
@@ -16,12 +28,12 @@ function Main(config={}){
 
     const { generateId } = config
 
-    function dispatchEvent(event){
-        config.onevent(event)
+    async function dispatchEvent(event){
+        await config.onevent(event)
         if( event.error ) {
-            config.onerror(event)
+            await config.onerror(event)
         } else {
-            config.onsuccess(event)
+            await config.onsuccess(event)
         }
     }
 
@@ -55,65 +67,21 @@ function Main(config={}){
         return event
     }
 
-    function processRequest(
-        request, parentEvent
-    ){
-        const { name, data, callback } = request
-
-        let event;
-        let childP;
-        if ( callback ) {
-            event = Event({
-                parentId: parentEvent.id
-                ,id: generateId()
-                ,name
-                ,startTime: Date.now()
-                ,endTime: null
-                ,data: { ...parentEvent.data || {}, ...data }
-                ,error: null
-            })
-            childP = Instance(event)
-            event.wait = parentEvent.wait
-        }
-
-        if ( callback && parentEvent.sync ) {
-            try {
-                const out = callback(childP)
-                if( out != null && 'then' in out ) {
-                    console.warn(name, 'A call to trace.sync was made but the response was async.  This is likely a mistake and should be corrected.')
-                }
-                return out
-            } catch (e) {
-                event.error = e
-                throw e
-            } finally {
-                event.endTime = Date.now()
-                dispatchEvent(event)
-            }
-        } else if ( callback && !parentEvent.sync ) {
-            let dangling = (async function(){
-                try {
-                    return await callback(childP)
-                } catch (e) {
-                    event.error = e
-                    throw e
-                } finally {
-                    event.endTime = Date.now()
-                    dispatchEvent(event)
-                }   
-            })()
-
-            // make it easy to wait before flushing
-            parentEvent.wait = parentEvent.wait.catch( () => dangling )
-
-            return dangling
-
-        } else if (!callback && data) {
-            parentEvent.data = { ...parentEvent.data, ...data }
-            return null
-        }
-        return null
+    function setupEvent({ parentEvent, name, data, sync }){
+        const event = Event({
+            parentId: parentEvent.id
+            ,id: generateId()
+            ,name
+            ,startTime: Date.now()
+            ,endTime: null
+            ,data: { ...parentEvent.data || {}, ...data }
+            ,error: null
+            ,sync: parentEvent.sync || sync
+        })
+        const childP = Instance(event)
+        return { childP, event }
     }
+
 
     function Instance(parentEvent){
         
@@ -136,27 +104,89 @@ function Main(config={}){
             return { name, data, callback: cb }
         }
 
-        function handlerAsync(...args){
+        function handlerData({ data }){
+            parentEvent.data = { ...parentEvent.data, ...data }
+            return null
+        }
+
+        async function handlerAsync({ event, childP, callback }){
             if ( parentEvent.sync ) {
                 throw new Error('Cannot use an async trace within a synchronous trace')
             }
             
-            return processRequest(handler(...args), parentEvent)
+            try {
+                const dangling = callback(childP)
+                rootEvent.wait = 
+                    rootEvent.wait
+                    .catch( () => {})
+                    .then( dangling )
+                const out = await dangling
+                return out
+            } catch (e) {
+                event.error = e
+                throw e
+            } finally {
+                event.endTime = Date.now()
+                rootEvent.wait = 
+                    rootEvent.wait
+                    .catch( () => {})
+                    .then( () => dispatchEvent(event))
+            }
+    
         }
 
-        function handlerSync(...args){
-            return processRequest(
-                handler(...args), { ...parentEvent, sync: true }
-            )
+        function handlerSync({ callback, name, event, childP }){
+            try {
+                const out = callback(childP)
+                if( out != null && 'then' in out ) {
+                    config.console.warn(name, 'A call to trace.sync was made but the response was async.  This is likely a mistake and should be corrected.')
+                }
+                return out
+            } catch (e) {
+                event.error = e
+                throw e
+            } finally {
+                event.endTime = Date.now()
+                rootEvent.wait = 
+                    rootEvent.wait
+                    .catch( () => {})
+                    .then( () => dispatchEvent(event))
+            }
         }
 
-        handlerAsync.sync = handlerSync
-        return handlerAsync
+        function routerOptions({ sync }, ...args){
+            const { data, callback, name } = handler(...args)
+            
+            const {event,childP} = 
+                callback ? setupEvent({ parentEvent, name, data, sync }) : {}
+
+            if( callback && sync ) {
+                return handlerSync({ data, callback, childP, name, event })
+            } else if ( callback && !sync ) {
+                return handlerAsync({ data, callback, childP, name, event })
+            } else {
+                return handlerData({ data })
+            }
+        }
+
+        async function routerAsync(...args){
+            const out = await routerOptions({ sync: false }, ...args)
+            return out
+        }
+
+        function routerSync(...args){
+            const out = routerOptions({ sync: true }, ...args)
+            return out
+        }
+
+        routerAsync.sync = routerSync
+        return routerAsync
     }
 
     let rootEvent = RootEvent()
     let handlerInstance = Instance(rootEvent)
     handlerInstance.flush = rootEvent.flush
+    handlerInstance.config = config
     return handlerInstance
 }
 

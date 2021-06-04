@@ -50,6 +50,7 @@ async function Usage({ fail }={}){
             'root.data.example': 1
         }
         ,dataset: 'stagnant'
+        ,config: { console }
     })
 
     try {
@@ -61,7 +62,6 @@ async function Usage({ fail }={}){
         return result
     } catch (e) {
         console.error(e)
-        throw e
     } finally {
         await p.flush()
     }
