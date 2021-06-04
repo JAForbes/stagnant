@@ -310,6 +310,14 @@ Event & { error: Error }
 
 Just like an event, but with an error attached.  This will be dispatched to your callback whenever a callback throws an exception.
 
+## Advanced
+
+### Logging
+
+By default stagnant calls `config.console` for all logging.  These logs functions are just empty functions.  You can enable logging by specifying `console: console` when initializing stagnant.
+
+When initializing honeycomb configuring stagnant options requires an outer key `config` so `{ config: { console } }`
+
 ## FAQ
 
 ### How do I instrument 3rd party libraries if everything is explicit?
