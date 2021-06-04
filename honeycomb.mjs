@@ -1,9 +1,9 @@
-/* globals console, process */
-import stagnant from './index.js'
+/* globals process */
+import stagnant from './index.mjs'
 import fetch from 'node-fetch'
 
 export default function Honey({ 
-    name='root'
+    name: rootName='root'
     , dataset='default'
     , writeKey=process.env.HONEYCOMB_WRITE_KEY
     // pass in traceId/parentId from an existing trace
@@ -20,8 +20,9 @@ export default function Honey({
     // every other event subsequently is a span within that root trace
     const root = stagnant({
         async onevent(event){
+            const name = event.parentId ? event.name : rootName
             const body = JSON.stringify({
-                name: event.parentId ? event.name : name
+                name
                 , ...data
                 , ...event.data
                 , error: event.error ? event.error.message : undefined
@@ -33,6 +34,7 @@ export default function Honey({
                 , duration_ms: event.endTime - event.startTime
             })
 
+            // console.log(name, event.error, event.endTime - event.startTime)
             await fetch(`https://api.honeycomb.io/1/events/${dataset}`, {
                 method: 'post'
                 ,headers: {

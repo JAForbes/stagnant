@@ -44,11 +44,11 @@ function Main(config={}){
 
         event.flush = async function flush(){
             delete event.flush
-            await event.wait.finally( () => {})
+            await event.wait.catch( () => {})
             delete event.wait
             event.endTime = Date.now()
-            dispatchEvent(event)
-            config.onflush(event)
+            await dispatchEvent(event)
+            await config.onflush(event)
             return event
         }
 
@@ -79,6 +79,9 @@ function Main(config={}){
         if ( callback && parentEvent.sync ) {
             try {
                 const out = callback(childP)
+                if( out != null && 'then' in out ) {
+                    console.warn(name, 'A call to trace.sync was made but the response was async.  This is likely a mistake and should be corrected.')
+                }
                 return out
             } catch (e) {
                 event.error = e
@@ -101,7 +104,7 @@ function Main(config={}){
             })()
 
             // make it easy to wait before flushing
-            parentEvent.wait = parentEvent.wait.finally( () => dangling )
+            parentEvent.wait = parentEvent.wait.catch( () => dangling )
 
             return dangling
 
@@ -137,6 +140,7 @@ function Main(config={}){
             if ( parentEvent.sync ) {
                 throw new Error('Cannot use an async trace within a synchronous trace')
             }
+            
             return processRequest(handler(...args), parentEvent)
         }
 

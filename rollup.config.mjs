@@ -8,8 +8,8 @@ cp.execSync('rm -rf dist || true')
 cp.execSync('rm *.cjs || true')
 
 const entries = [
-    ['index.js', 'stagnant']
-    ,['honeycomb.js', 'stagnant-honeycomb']
+    ['index.mjs', 'stagnant']
+    ,['honeycomb.mjs', 'stagnant-honeycomb']
 ]
 
 const formats = entries.flatMap(
@@ -29,7 +29,7 @@ const config = formats.map(
         ]
 
         if( format == 'cjs' ) {
-            outputName = path.basename(input, '.js')
+            outputName = path.basename(input, '.mjs')
         }
 
         const filename = outputName + extension
