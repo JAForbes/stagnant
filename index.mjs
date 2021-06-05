@@ -121,11 +121,8 @@ function Main(config={}){
                 event.error = e
                 throw e
             } finally {
-                try {
-                    await dispatchEvent(event)
-                } catch (e) {
-                    config.console.error('Failed to dispatch event', e)
-                }
+                dispatchEvent(event)
+                    .catch( e => config.console.error('Failed to dispatch event', e))
             }
     
         }
