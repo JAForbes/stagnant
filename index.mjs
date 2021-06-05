@@ -52,12 +52,9 @@ function Main(config={}){
             ,error: null
             ,data: {}
         })
-        event.wait = Promise.resolve()
 
         event.flush = async function flush(){
             delete event.flush
-            await event.wait.catch( () => {})
-            delete event.wait
             event.endTime = Date.now()
             await dispatchEvent(event)
             await config.onflush(event)
@@ -116,10 +113,6 @@ function Main(config={}){
             
             try {
                 const dangling = callback(childP)
-                rootEvent.wait = 
-                    rootEvent.wait
-                    .catch( () => {})
-                    .then( dangling )
                 const out = await dangling
                 return out
             } catch (e) {
@@ -127,10 +120,11 @@ function Main(config={}){
                 throw e
             } finally {
                 event.endTime = Date.now()
-                rootEvent.wait = 
-                    rootEvent.wait
-                    .catch( () => {})
-                    .then( () => dispatchEvent(event))
+                try {
+                    await dispatchEvent(event)
+                } catch (e) {
+                    config.console.error('Failed to dispatch event', e)
+                }
             }
     
         }
@@ -147,10 +141,8 @@ function Main(config={}){
                 throw e
             } finally {
                 event.endTime = Date.now()
-                rootEvent.wait = 
-                    rootEvent.wait
-                    .catch( () => {})
-                    .then( () => dispatchEvent(event))
+                dispatchEvent(event)
+                    .catch( e => config.console.error('Failed to dispatch event', e))
             }
         }
 

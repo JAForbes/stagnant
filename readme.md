@@ -38,7 +38,9 @@ Depending on your project structure node.js will either import the native ESM mo
 - CJS Stagnant Bundle: `const stagnant = require('stagnant')`
 
 - Native ESM Stagnant Honeycomb Module: `import stagnant from 'stagnant/honeycomb.js'`
-- CJS Stagnant Honeycomb Bundle: `const stagnant = require('stagnant/honeycomb')`
+- CJS Stagnant Honeycomb Bundle: `const stagnant = require('stagnant/honeycomb.cjs')`
+
+> 🤓 If anyone knows how to make `require('stagnant/honeycomb')` automatically point to the `honeycomb.cjs` please let me know!
 
 ## Quick Start
 
@@ -247,6 +249,10 @@ await p.flush()
 ```
 
 It's best to not use `p` after calling flush as the total duration of rootEvent will be less than the summed duration of any child events... which would be weird.
+
+Keep in mind, `flush` doesn't wait for other events to finish that is your responsibility.  Generally call `flush` in a `finally` that wraps your entrypoint.
+
+That's a high level philisophical distinction in stagnant with other libraries, there's next to no magic, just a nice pure dose of sugar.
 
 
 ### stagnant.Options
