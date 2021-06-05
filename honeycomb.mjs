@@ -23,9 +23,9 @@ export default function Honey({
         async onevent(event){
             const name = event.parentId ? event.name : rootName
             const body = JSON.stringify({
-                name
+                ...event.data
                 , ...data
-                , ...event.data
+                , name
                 , error: event.error ? event.error.message : undefined
                 ,'error.stack': event.error ? event.error.stack : undefined
                 , 'trace.trace_id': 'trace-'+ traceId
