@@ -113,14 +113,14 @@ function Main(config={}){
             
             try {
                 event.startTime = Date.now()
-                const dangling = callback(childP)
-                const out = await dangling
+                const out = await callback(childP)
+                event.endTime = Date.now()
                 return out
             } catch (e) {
+                event.endTime = Date.now()
                 event.error = e
                 throw e
             } finally {
-                event.endTime = Date.now()
                 try {
                     await dispatchEvent(event)
                 } catch (e) {
@@ -134,15 +134,16 @@ function Main(config={}){
             try {
                 event.startTime = Date.now()
                 const out = callback(childP)
+                event.endTime = Date.now()
                 if( out != null && 'then' in out ) {
                     config.console.warn(name, 'A call to trace.sync was made but the response was async.  This is likely a mistake and should be corrected.')
                 }
                 return out
             } catch (e) {
+                event.endTime = Date.now()
                 event.error = e
                 throw e
             } finally {
-                event.endTime = Date.now()
                 dispatchEvent(event)
                     .catch( e => config.console.error('Failed to dispatch event', e))
             }
