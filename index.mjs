@@ -69,7 +69,7 @@ function Main(config={}){
             parentId: parentEvent.id
             ,id: generateId()
             ,name
-            ,startTime: Date.now()
+            ,startTime: null
             ,endTime: null
             ,data: { ...parentEvent.data || {}, ...data }
             ,error: null
@@ -112,6 +112,7 @@ function Main(config={}){
             }
             
             try {
+                event.startTime = Date.now()
                 const dangling = callback(childP)
                 const out = await dangling
                 return out
@@ -131,6 +132,7 @@ function Main(config={}){
 
         function handlerSync({ callback, name, event, childP }){
             try {
+                event.startTime = Date.now()
                 const out = callback(childP)
                 if( out != null && 'then' in out ) {
                     config.console.warn(name, 'A call to trace.sync was made but the response was async.  This is likely a mistake and should be corrected.')
