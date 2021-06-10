@@ -47,7 +47,7 @@ export default function Honey({
                     }
                     ,body
                 })
-                root.config.console.log(response.status)
+                root.config.console.log(name, response.status, body);
                 if( !event.parentId ) {
                     root.config.console.log('flushed', response.status )
                 }
