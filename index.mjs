@@ -92,7 +92,7 @@ function Main(config={}){
             if (typeof name != 'string') {
                 data = name
                 if( cb ) {
-                    name = cb.toString().replace( /\s/g, '' ).replace( /(.)*=>/, '' )
+                    name = data.name || cb.toString().replace( /\s/g, '' ).replace( /(.)*=>/, '' );
                 }
             }
 
