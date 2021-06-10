@@ -205,4 +205,23 @@ function call(trace, ...args){
 
 Main.call = call
 
+/**
+ * Create a no-op trace if provided trace is null
+ * 
+ * Much like stagnant.call, useful when there are multiple entry points into a function and some are not
+ * passing in a trace.
+ * 
+ * @param {*} trace 
+ * @param  {...any} args 
+ * @returns 
+ */
+function ensure(trace){
+    if( trace ) {
+        return trace
+    } else {
+        return (...args) => call(null, ...args)
+    }
+}
+
+Main.ensure = ensure
 export default Main

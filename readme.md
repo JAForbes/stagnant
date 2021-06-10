@@ -186,6 +186,23 @@ Initialize a trace.
 `stagnant.call( trace?, ...args, () -> b ) -> b`
 
 Safely invoke a trace callback even if the trace is null.  Fairly useful for writing wrappers around 3rd party libraries that may be invoked by code without a trace variable.
+
+### stagnant.ensure
+
+> Stability: 💀 Unstable
+
+`trace = stagnant.ensure( trace? )`
+
+Much like stagnant.call, but instead of immediately invoking the trace (if it exists), a mock trace is returned that will execute just fine but will not actually create any events or traces behind the scenes.
+
+```js
+async function something(event){
+    event.I = stagnant.ensure(event.I)
+
+    await event.I( 'will work even if event.I is null', () => db.query('select 1+1') )
+}
+```
+
 ### Trace
 
 `Trace` is often aliased as `p` (for profile).  Usually you invoke trace with a callback.  stagnant
