@@ -19,11 +19,11 @@ function verifyParams(event){
     return event
 }
 async function callVerified(event){
-    const { p } = event
-    p({ 'someCallVerifiedData': 3 })
+    const { I } = event
+    I({ 'someCallVerifiedData': 3 })
 
-    event = p.sync( () => verifyParams(event) )
-    const out = await p( { 'callData': 4 }, () => call(event) )
+    event = I.sync( () => verifyParams(event) )
+    const out = await I( { 'callData': 4 }, () => call(event) )
     return out
 }
 
@@ -44,7 +44,7 @@ async function filterResults(result){
 }
 
 async function Usage({ fail }={}){
-    const p = Honey({
+    const I = Honey({
         name: 'testing-data'
         ,data: { 
             'root.data.example': 1
@@ -55,15 +55,15 @@ async function Usage({ fail }={}){
 
     try {
         let event = { fail }
-        event = await p( 'parseEvent', { 'parseEventData.example': 2 }, () => parseEvent(event) )
-        let result = await p( p => callVerified({ ...event, fail, p }) )
-        result = await p( () => standardResult(event, result) )
-        result = await p( () => filterResults(event, result) )
+        event = await I( 'parseEvent', { 'parseEventData.example': 2 }, () => parseEvent(event) )
+        let result = await I( I => callVerified({ ...event, fail, I }) )
+        result = await I( () => standardResult(event, result) )
+        result = await I( () => filterResults(event, result) )
         return result
     } catch (e) {
         console.error(e)
     } finally {
-        await p.flush()
+        await I.flush()
     }
 
 

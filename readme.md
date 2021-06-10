@@ -40,7 +40,7 @@ Depending on your project structure node.js will either import the native ESM mo
 - Native ESM Stagnant Honeycomb Module: `import stagnant from 'stagnant/honeycomb.js'`
 - CJS Stagnant Honeycomb Bundle: `const stagnant = require('stagnant/honeycomb.cjs')`
 
-> 🤓 If anyone knows how to make `require('stagnant/honeycomb')` automatically point to the `honeycomb.cjs` please let me know!
+> 🤓 If anyone knows how to make `require('stagnant/honeycomb')` automatically point to the `honeycomb.cjs` file, please let me know!
 
 ## Quick Start
 
@@ -88,7 +88,7 @@ async function main(){
 
 ```js
 
-import P from 'stagnant'
+import stagnant from 'stagnant'
 
 async function main(trace){
 
@@ -163,7 +163,7 @@ const options = {
     }
 }
 
-const trace = P(options)
+const trace = stagnant(options)
 
 main(trace).finally( () => {
     // all events ready to inspect
@@ -187,6 +187,16 @@ Initialize a trace.
 
 Safely invoke a trace callback even if the trace is null.  Fairly useful for writing wrappers around 3rd party libraries that may be invoked by code without a trace variable.
 
+```js
+async function something(event){
+
+    // instead of:
+    // await event.trace( 'normal invocation style', () => db.query('select 1+1') )
+    await stagnant.call(event.trace, 'safer invocation style', () => db.query('select 1+1') )
+}
+```
+
+
 ### stagnant.ensure
 
 > Stability: 💀 Unstable
@@ -197,39 +207,39 @@ Much like stagnant.call, but instead of immediately invoking the trace (if it ex
 
 ```js
 async function something(event){
-    event.I = stagnant.ensure(event.I)
+    event.trace = stagnant.ensure(event.trace)
 
-    await event.I( 'will work even if event.I is null', () => db.query('select 1+1') )
+    await event.trace( 'will work even if event.trace is null', () => db.query('select 1+1') )
 }
 ```
 
 ### Trace
 
-`Trace` is often aliased as `p` (for profile).  Usually you invoke trace with a callback.  stagnant
+`Trace` is often aliased as `I` (for _instrument_).  Usually you invoke trace with a callback.  stagnant
 will time how long it takes for a promise returned from that callback to settle.
 
 ```js
-const p = stagnant(options)
+const I = stagnant(options)
 
-let output = await p( () => myAsyncFunction() )
+let output = await I( () => myAsyncFunction() )
 ```
 
 You can also measure a synchronous function
 
 ```js
-let output = p.sync( () => mySynchronousFunction() )
+let output = I.sync( () => mySynchronousFunction() )
 ```
 You can attach data to the current event and any child events via `trace( data )`.
 
 ```js
 // all child events will have the url and method property attached to event.data
-p({ url, method })
+I({ url, method })
 ```
 
 You can also pass in data when setting up a callback to be traced:
 
 ```js
-p({ url, method }, () => callEndpoint() )
+I({ url, method }, () => callEndpoint() )
 ```
 
 By default `stagnant` will name the event using the `Function::toString()` method of your callback.  But you can explicitly name an event as well via two approaches.
@@ -239,19 +249,19 @@ By default `stagnant` will name the event using the `Function::toString()` metho
 
 ```js
 // string as first arg
-p('call the endpoint', { url, method }, () => callEndpoint())
+I('call the endpoint', { url, method }, () => callEndpoint())
 
 // name attribute on the data object
-p({ name: 'call the endpoint', url, method }, () => callEndpoint())
+I({ name: 'call the endpoint', url, method }, () => callEndpoint())
 ```
 
 You can create detailed call graphs by taking advantage of the child span constructor passed in to all callbacks:
 
 ```js
 
-p( 'outer', p => 
-    p('inner', p => 
-        p('core', () => ... )
+I( 'outer', p => 
+    I('inner', p => 
+        I('core', () => ... )
     )
 )
 ```
@@ -262,10 +272,10 @@ When you are done measuring your code call `trace.flush` to signal to stagnant t
 
 
 ```js
-await p.flush()
+await I.flush()
 ```
 
-It's best to not use `p` after calling flush as the total duration of rootEvent will be less than the summed duration of any child events... which would be weird.
+It's best to not use `I` after calling flush as the total duration of rootEvent will be less than the summed duration of any child events... which would be weird.
 
 Keep in mind, `flush` doesn't wait for other events to finish that is your responsibility.  Generally call `flush` in a `finally` that wraps your entrypoint.
 
@@ -349,15 +359,15 @@ Short answer, you don't.
 
 Long answer, instead of directly calling the 3rd party library, call your own function that calls the library and time that.
 
-You can use `stagnant.call( p, () => ...)` instead of `p( () => ... )` to safe guard against not having a trace variable.
+You can use `stagnant.call( trace, () => ...)` or `stagnant.ensure(trace)` instead of `trace( () => ... )` to safe guard against not having a trace variable.
 
-If the trace: `p` is undefined, `stagnant` will just invoke the callback without creating a trace.  That way you can write code that will behave just fine even if there is no trace variable passed down.  This also means you can disable tracing in your codebase without having to restructure your code beyond not passing down a trace at the entry point.
+If the trace is undefined, `stagnant` will just invoke the callback without creating a trace.  That way you can write code that will behave just fine even if there is no trace variable passed down.  This also means you can disable tracing in your codebase without having to restructure your code beyond not passing down a trace at the entry point.
 
 ```js
-const P = require('stagnant')
+const stagnant = require('stagnant')
 
 function query(query, values, p=null){
-    const results = await P.call(p, () => db.query(query,values))
+    const results = await stagnant.call(p, () => db.query(query,values))
     return results
 }
 
