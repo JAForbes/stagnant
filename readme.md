@@ -259,8 +259,8 @@ You can create detailed call graphs by taking advantage of the child span constr
 
 ```js
 
-I( 'outer', p => 
-    I('inner', p => 
+I( 'outer', I => // rebind I
+    I('inner', I => // to create nested traces
         I('core', () => ... )
     )
 )
