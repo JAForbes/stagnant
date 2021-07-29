@@ -1,4 +1,4 @@
-export function defaultConfig(){
+function defaultConfig(){
 
     function onevent(){}
     function onerror(){}
@@ -276,3 +276,4 @@ function ensure(trace){
 }
 
 Main.ensure = ensure
+Main.defaultConfig = defaultConfig

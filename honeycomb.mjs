@@ -1,6 +1,6 @@
 /* globals process */
 import fetch from 'node-fetch'
-import stagnant, * as S from './index.mjs'
+import stagnant from './index.mjs'
 
 
 export default function Main({ 
@@ -18,7 +18,7 @@ export default function Main({
 }={}){
 
 
-    config = S.defaultConfig(config)
+    config = stagnant.defaultConfig(config)
     // Traces aren't nested, but a trace can contain nested spans.
     // We create a root trace for every invocation of Honey
     // every other event subsequently is a span within that root trace

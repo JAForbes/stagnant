@@ -48,7 +48,7 @@ const config = formats.map(
                 ,sourcemap
                 ,format
                 ,file: path.resolve(dir, filename)
-                ,exports: ['default', 'defaultConfig']
+                ,exports: ['default']
             }
         }
 
