@@ -227,6 +227,9 @@ export default function Main(config={}){
     }
     
     start.resume = resume
+    start.start = function start(){
+        return start().start()
+    }
     
     return start
 }
