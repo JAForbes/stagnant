@@ -7,16 +7,10 @@ export default function Main({
     name: rootName='root'
     , dataset='default'
     , writeKey=process.env.HONEYCOMB_WRITE_KEY
-    // pass in traceId/parentId from an existing trace
-    // e.g. to continue a trace from another server, or 
-    // even the browser
-    // otherwise leave blank
-    , traceId= Math.random().toString(15).slice(2,8)
     , parentId= undefined
     , data={} 
     , config={}
 }={}){
-
 
     config = { ...stagnant.defaultConfig(), ...config }
     delete config.onevent
@@ -32,7 +26,7 @@ export default function Main({
                 , name
                 , error: event.error ? event.error.message : undefined
                 ,'error.stack': event.error ? event.error.stack : undefined
-                , 'trace.trace_id': 'trace-'+ traceId
+                , 'trace.trace_id': 'trace-'+ event.traceId
                 , 'trace.span_id': 'span-' + event.id
                 , 'trace.parent_id': event.parentId ? 'span-' + event.parentId : parentId
                 , service_name: 'stagnant'

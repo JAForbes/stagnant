@@ -43,10 +43,11 @@ export default function Main(config={}){
         return { parentId, id, startTime, endTime, name, data, error }
     }
 
-    function RootEvent(){
+    function RootEvent({ traceId=generateId() }={}){
         const event = Event({
             parentId: null
             ,id: generateId()
+            ,traceId
             ,startTime: Date.now()
             ,endTime: Date.now()
             ,error: null
@@ -67,6 +68,7 @@ export default function Main(config={}){
     function setupEvent({ parentEvent, name, data, sync }){
         const event = Event({
             parentId: parentEvent.id
+            ,traceId: parentEvent.traceId
             ,id: generateId()
             ,name
             ,startTime: null
@@ -186,6 +188,9 @@ export default function Main(config={}){
             return lastTrace;
         }
         routerAsync.activeTraceId = function activeTrace(){
+            return lastTrace && lastTrace.traceId;
+        }
+        routerAsync.activeSpanId = function activeTrace(){
             return lastTrace && lastTrace.id;
         }
         routerAsync.start = function startTrace(...args){
