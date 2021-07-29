@@ -188,6 +188,24 @@ export default function Main(config={}){
         routerAsync.activeTraceId = function activeTrace(){
             return lastTrace && lastTrace.id;
         }
+        routerAsync.start = function startTrace(...args){
+            let finish
+            let child;
+            let done = routerAsync( ... args.concat(I => {
+                child = I
+                return new Promise((Y) => {
+                    finish = Y
+                })
+            }))
+    
+            return {
+                finish(){
+                    finish()
+                    return done
+                }
+                , child
+            }
+        }
         return routerAsync
     }
 
@@ -209,7 +227,7 @@ export default function Main(config={}){
     }
     
     start.resume = resume
-
+    
     return start
 }
 
