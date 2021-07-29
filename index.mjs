@@ -22,7 +22,7 @@ function defaultConfig(){
     }
 }
 
-function Main(config={}){
+export default function Main(config={}){
 
     config = { ...defaultConfig(), ...config }
 
@@ -191,11 +191,24 @@ function Main(config={}){
         return routerAsync
     }
 
-    let rootEvent = RootEvent()
-    let handlerInstance = Instance(rootEvent)
-    handlerInstance.flush = rootEvent.flush
-    handlerInstance.config = config
-    return handlerInstance
+    function start(){
+        let rootEvent = RootEvent()
+        let handlerInstance = Instance(rootEvent)
+        handlerInstance.flush = rootEvent.flush
+        handlerInstance.config = config
+    }
+
+    function resume({ ...theirEvent }={}){
+        let rootEvent = RootEvent()
+        rootEvent = { rootEvent, ...theirEvent}
+        let handlerInstance = Instance(rootEvent)
+        handlerInstance.flush = rootEvent.flush
+        handlerInstance.config = config
+    }
+    
+    start.resume = resume
+
+    return start
 }
 
 /**
@@ -240,6 +253,3 @@ function ensure(trace){
 }
 
 Main.ensure = ensure
-export default function Setup(config){
-    return () => Main(config)
-}
