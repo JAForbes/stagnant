@@ -196,6 +196,7 @@ export default function Main(config={}){
         let handlerInstance = Instance(rootEvent)
         handlerInstance.flush = rootEvent.flush
         handlerInstance.config = config
+        return handlerInstance
     }
 
     function resume({ ...theirEvent }={}){
@@ -204,6 +205,7 @@ export default function Main(config={}){
         let handlerInstance = Instance(rootEvent)
         handlerInstance.flush = rootEvent.flush
         handlerInstance.config = config
+        return handlerInstance
     }
     
     start.resume = resume
