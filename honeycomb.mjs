@@ -2,7 +2,7 @@
 import stagnant from './index.mjs'
 import fetch from 'node-fetch'
 
-export default function Honey({ 
+export default function Main({ 
     name: rootName='root'
     , dataset='default'
     , writeKey=process.env.HONEYCOMB_WRITE_KEY

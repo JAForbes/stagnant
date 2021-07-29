@@ -240,4 +240,6 @@ function ensure(trace){
 }
 
 Main.ensure = ensure
-export default Main
+export default function Setup(config){
+    return () => Main(config)
+}
