@@ -81,6 +81,8 @@ function Main(config={}){
 
 
     function Instance(parentEvent){
+
+        let lastTrace = null;
         
         function handler(...args){
             const callbackIndex = args.findIndex( x => typeof x == 'function' )
@@ -113,6 +115,7 @@ function Main(config={}){
             
             try {
                 event.startTime = Date.now()
+                lastTrace = event
                 const out = await callback(childP)
                 event.endTime = Date.now()
                 return out
@@ -123,6 +126,9 @@ function Main(config={}){
             } finally {
                 dispatchEvent(event)
                     .catch( e => config.console.error('Failed to dispatch event', e))
+                if (lastTrace && lastTrace.id == event.id ) {
+                    lastTrace = null
+                }
             }
     
         }
@@ -130,6 +136,7 @@ function Main(config={}){
         function handlerSync({ callback, name, event, childP }){
             try {
                 event.startTime = Date.now()
+                lastTrace = event
                 const out = callback(childP)
                 event.endTime = Date.now()
                 if( out != null && 'then' in out ) {
@@ -143,6 +150,9 @@ function Main(config={}){
             } finally {
                 dispatchEvent(event)
                     .catch( e => config.console.error('Failed to dispatch event', e))
+                if (lastTrace && lastTrace.id == event.id ) {
+                    lastTrace = null
+                }
             }
         }
 
@@ -172,6 +182,12 @@ function Main(config={}){
         }
 
         routerAsync.sync = routerSync
+        routerAsync.activeTrace = function activeTrace(){
+            return lastTrace;
+        }
+        routerAsync.activeTraceId = function activeTrace(){
+            return lastTrace && lastTrace.id;
+        }
         return routerAsync
     }
 
