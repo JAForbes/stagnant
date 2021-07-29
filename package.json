@@ -14,8 +14,9 @@
   },
   "files": [
     "dist/*",
-    "index.js",
-    "honeycomb.js",
+    "index.mjs",
+    "index.cjs",
+    "honeycomb.mjs",
     "*.cjs"
   ],
   "author": "",
