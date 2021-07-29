@@ -19,6 +19,7 @@ export default function Main({
 
 
     config = { ...stagnant.defaultConfig(), ...config }
+    delete config.onevent
     // Traces aren't nested, but a trace can contain nested spans.
     // We create a root trace for every invocation of Honey
     // every other event subsequently is a span within that root trace
