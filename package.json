@@ -18,6 +18,7 @@
     "index.mjs",
     "index.cjs",
     "honeycomb.mjs",
+    "rollup.config.js",
     "*.cjs"
   ],
   "author": "",
