@@ -1,4 +1,4 @@
-function defaultConfig(){
+export function defaultConfig(){
 
     function onevent(){}
     function onerror(){}
@@ -8,9 +8,9 @@ function defaultConfig(){
     // eslint-disable-next-line no-undef
     
     const ourConsole = {
-        log(){},
-        error(){},
-        warn(){}
+        log(){}
+        ,error(){}
+        ,warn(){}
     }
 
     function generateId(){
