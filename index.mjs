@@ -220,7 +220,8 @@ export default function Main(config={}){
     function resume({ ...theirEvent }={}){
         let rootEvent = RootEvent()
         let flush = rootEvent.flush
-        rootEvent = { rootEvent, ...theirEvent}
+        // so flush has access to the new data
+        Object.assign(rootEvent, theirEvent)
         let handlerInstance = Instance(rootEvent)
         handlerInstance.flush = flush
         handlerInstance.config = config
