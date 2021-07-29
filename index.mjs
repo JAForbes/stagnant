@@ -219,9 +219,10 @@ export default function Main(config={}){
 
     function resume({ ...theirEvent }={}){
         let rootEvent = RootEvent()
+        let flush = rootEvent.flush
         rootEvent = { rootEvent, ...theirEvent}
         let handlerInstance = Instance(rootEvent)
-        handlerInstance.flush = rootEvent.flush
+        handlerInstance.flush = flush
         handlerInstance.config = config
         return handlerInstance
     }
