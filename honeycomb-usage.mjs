@@ -1,5 +1,5 @@
 /* globals console, setTimeout, process */
-import Honey from './honeycomb.mjs'
+import Stagnant from './honeycomb.mjs'
 
 function delay(ms){
     return new Promise( Y => setTimeout(Y, ms))
@@ -44,7 +44,7 @@ async function filterResults(result){
 }
 
 async function Usage({ fail }={}){
-    const I = Honey({
+    const stagnant = Stagnant({
         name: 'testing-data'
         ,data: { 
             'root.data.example': 1
@@ -53,6 +53,8 @@ async function Usage({ fail }={}){
         ,config: { console }
     })
 
+    // start trace
+    let I = stagnant()
     try {
         let event = { fail }
         event = await I( 'parseEvent', { 'parseEventData.example': 2 }, () => parseEvent(event) )

@@ -1,3 +1,13 @@
+let generatorProto = Object.getPrototypeOf(function * (){})
+
+let isIterator = x =>
+    x != null
+    && typeof x[Symbol.iterator] === 'function';
+
+let isGenerator = x => 
+    x != null
+    && Object.getPrototypeOf(x) === Object.getPrototypeOf(generatorProto)
+
 function defaultConfig(){
 
     function onevent(){}
@@ -87,7 +97,7 @@ export default function Main(config={}){
         let lastTrace = null;
         
         function handler(...args){
-            const callbackIndex = args.findIndex( x => typeof x == 'function' )
+            const callbackIndex = args.findIndex( x => typeof x == 'function' || isIterator(x) )
             let cb = args[callbackIndex]
             let rest = callbackIndex > 0 ? args.slice(0,callbackIndex) : args
 
@@ -158,13 +168,53 @@ export default function Main(config={}){
             }
         }
 
+        function handlerGenerator({ callback, name, event, childP }){
+            
+            return function * () {
+
+                try {
+                    let it = callback(childP)
+
+                    event.startTime = Date.now()
+                    lastTrace = event
+                    let prev;
+                    for ( let x of it ) {
+                        prev = yield x
+                    }
+                    event.endTime = Date.now()
+                    const out = await callback(childP)
+                    return prev
+                } catch (e) {
+                    event.endTime = Date.now()
+                    event.error = e
+                    throw e
+                } finally {
+                    dispatchEvent(event)
+                        .catch( e => config.console.error('Failed to dispatch event', e))
+                    if (lastTrace && lastTrace.id == event.id ) {
+                        lastTrace = null
+                    }
+                }
+            }
+            
+        }
+
+        function handlerIterator({ callback, name, event, childP }){
+            let generator = handlerGenerator({ callback, name, event, childP }) 
+            return generator()
+        }
+
         function routerOptions({ sync }, ...args){
             const { data, callback, name } = handler(...args)
             
             const {event,childP} = 
                 callback ? setupEvent({ parentEvent, name, data, sync }) : {}
 
-            if( callback && sync ) {
+            if ( callback && isGenerator(callback) ) {
+                return handlerGenerator({ data, callback, childP, name, event })
+            } else if ( callback && isIterator(callback) ) {
+                return handlerIterator({ data, callback, childP, name, event })
+            } else if( callback && sync ) {
                 return handlerSync({ data, callback, childP, name, event })
             } else if ( callback && !sync ) {
                 return handlerAsync({ data, callback, childP, name, event })
@@ -173,8 +223,8 @@ export default function Main(config={}){
             }
         }
 
-        async function routerAsync(...args){
-            const out = await routerOptions({ sync: false }, ...args)
+        function router(...args){
+            const out = routerOptions({ sync: false }, ...args)
             return out
         }
 
@@ -183,17 +233,17 @@ export default function Main(config={}){
             return out
         }
 
-        routerAsync.sync = routerSync
-        routerAsync.activeTrace = function activeTrace(){
+        router.sync = routerSync
+        router.activeTrace = function activeTrace(){
             return lastTrace;
         }
-        routerAsync.activeTraceId = function activeTrace(){
+        router.activeTraceId = function activeTrace(){
             return lastTrace && lastTrace.traceId;
         }
-        routerAsync.activeSpanId = function activeTrace(){
+        router.activeSpanId = function activeTrace(){
             return lastTrace && lastTrace.id;
         }
-        routerAsync.start = function startTrace(...args){
+        router.start = function startTrace(...args){
             let finish
             let child;
             let done = routerAsync( ... args.concat(I => {
@@ -211,7 +261,7 @@ export default function Main(config={}){
                 , child
             }
         }
-        return routerAsync
+        return router
     }
 
     function start(){
