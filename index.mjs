@@ -182,11 +182,11 @@ export default function Main(config={}){
                     let prev = {};
                     while ( true ) {
                         prev = it.next(prev.value)
+                        yield prev.value
                         if( prev.done ) break;
                     }
-                    return prev.value
                     event.endTime = Date.now()
-                    return prev
+                    return prev.value
                 } catch (e) {
                     event.endTime = Date.now()
                     event.error = e
