@@ -177,7 +177,7 @@ export default function Main(config={}){
 
                     event.startTime = Date.now()
                     lastTrace = event
-                    let prev;
+                    let prev = {};
                     while ( true ) {
                         prev = it.next(prev.value)
                         if( prev.done ) break;
