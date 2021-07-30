@@ -183,9 +183,10 @@ export default function Main(config={}){
                     while ( true ) {
                         try {
                             prev = it.next(prev.value)
+                            yield prev.value
+                            if( prev.done ) break;
                         } catch (e) {
                             prev = it.throw(e)
-                        } finally {
                             yield prev.value
                             if( prev.done ) break;
                         }
