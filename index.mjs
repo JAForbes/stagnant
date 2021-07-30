@@ -217,7 +217,9 @@ export default function Main(config={}){
                 callback ? setupEvent({ parentEvent, name, data, sync }) : {}
 
             if ( callback && isGenerator(callback) ) {
-                return handlerGenerator({ data, callback, childP, name, event })
+                return handlerGenerator({ 
+                    data, callback, childP, name, event 
+                })()
             } else if ( callback && isSequence(callback) ) {
                 return handlerIterator({ data, callback, childP, name, event })
             } else if( callback && sync ) {
