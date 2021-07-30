@@ -168,7 +168,7 @@ export default function Main(config={}){
             }
         }
 
-        function handlerGenerator({ callback, name, event, childP }){
+        function handlerGenerator({ callback, event, childP }){
             
             return function * () {
 
@@ -182,7 +182,6 @@ export default function Main(config={}){
                         prev = yield x
                     }
                     event.endTime = Date.now()
-                    const out = await callback(childP)
                     return prev
                 } catch (e) {
                     event.endTime = Date.now()
@@ -246,7 +245,7 @@ export default function Main(config={}){
         router.start = function startTrace(...args){
             let finish
             let child;
-            let done = routerAsync( ... args.concat(I => {
+            let done = router( ... args.concat(I => {
                 child = I
                 return new Promise((Y) => {
                     finish = Y
