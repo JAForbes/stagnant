@@ -199,7 +199,10 @@ export default function Main(config={}){
         }
 
         function handlerIterator({ callback, name, event, childP }){
-            let generator = handlerGenerator({ callback, name, event, childP }) 
+            let ourCallback = () => callback
+            let generator = handlerGenerator({ 
+                callback: ourCallback, name, event, childP 
+            }) 
             return generator()
         }
 
