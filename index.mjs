@@ -8,7 +8,7 @@ let isSequence = x =>
 
 let isGenerator = x => 
     x != null
-    && Object.getPrototypeOf(x) === Object.getPrototypeOf(generatorProto)
+    && Object.getPrototypeOf(x) === generatorProto
 
 function defaultConfig(){
 
