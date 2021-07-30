@@ -1,7 +1,9 @@
 let generatorProto = Object.getPrototypeOf(function * (){})
 
-let isIterator = x =>
+let isSequence = x =>
     x != null
+    && typeof x != 'string'
+    && !Array.isArray(x)
     && typeof x[Symbol.iterator] === 'function';
 
 let isGenerator = x => 
@@ -97,7 +99,7 @@ export default function Main(config={}){
         let lastTrace = null;
         
         function handler(...args){
-            const callbackIndex = args.findIndex( x => typeof x == 'function' || isIterator(x) )
+            const callbackIndex = args.findIndex( x => typeof x == 'function' || isSequence(x) )
             let cb = args[callbackIndex]
             let rest = callbackIndex > 0 ? args.slice(0,callbackIndex) : args
 
@@ -216,7 +218,7 @@ export default function Main(config={}){
 
             if ( callback && isGenerator(callback) ) {
                 return handlerGenerator({ data, callback, childP, name, event })
-            } else if ( callback && isIterator(callback) ) {
+            } else if ( callback && isSequence(callback) ) {
                 return handlerIterator({ data, callback, childP, name, event })
             } else if( callback && sync ) {
                 return handlerSync({ data, callback, childP, name, event })
