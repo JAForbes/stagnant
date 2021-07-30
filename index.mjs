@@ -181,9 +181,13 @@ export default function Main(config={}){
                     lastTrace = event
                     let prev = {};
                     while ( true ) {
-                        prev = it.next(prev.value)
-                        yield prev.value
-                        if( prev.done ) break;
+                        try {
+                            prev = it.next(prev.value)
+                            yield prev.value
+                            if( prev.done ) break;
+                        } catch (e) {
+                            yield it.throw(e)
+                        }
                     }
                     event.endTime = Date.now()
                     return prev.value
