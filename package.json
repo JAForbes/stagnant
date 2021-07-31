@@ -7,7 +7,7 @@
   "browser": "dist/stagnant.browser.min.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepublish": "rollup -c rollup.config.mjs"
+    "prepare": "rollup -c rollup.config.mjs"
   },
   "engines": {
     "node": ">=14.0.0"
