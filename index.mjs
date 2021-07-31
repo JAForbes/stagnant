@@ -50,9 +50,9 @@ export default function Main(config={}){
     }
 
     function Event({
-        parentId, id, startTime, endTime, name, data, error
+        parentId, id, traceId, startTime, endTime, name, data, error
     }){
-        return { parentId, id, startTime, endTime, name, data, error }
+        return { parentId, id, traceId, startTime, endTime, name, data, error }
     }
 
     function RootEvent({ traceId=generateId() }={}){
