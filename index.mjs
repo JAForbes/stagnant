@@ -271,8 +271,13 @@ export default function Main(config={}){
 
     function resume({ ...theirEvent }={}){
         let rootEvent = RootEvent()
+
+        // filter out undefined and unserializable values
+        theirEvent = JSON.parse(JSON.stringify(theirEvent))
+        
         // so flush has access to the new data
         Object.assign(rootEvent, theirEvent)
+        
         let handlerInstance = Instance(rootEvent)
         handlerInstance.flush = function(){}
         handlerInstance.config = config
