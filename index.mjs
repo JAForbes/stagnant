@@ -240,33 +240,7 @@ export default function Main(config={}){
         router.id = function id(){
             return parentEvent.id
         }
-        router.start = function startTrace(...args){
-            let finish
-            let child;
-            let done = router( ... args.concat(I => {
-                child = I
-                return new Promise((Y) => {
-                    finish = Y
-                })
-            }))
-    
-            return {
-                finish(){
-                    finish()
-                    return done
-                }
-                , child
-            }
-        }
         return router
-    }
-
-    function start(){
-        let rootEvent = RootEvent()
-        let handlerInstance = Instance(rootEvent)
-        handlerInstance.flush = rootEvent.flush
-        handlerInstance.config = config
-        return handlerInstance
     }
 
     function resume({ ...theirEvent }={}){
@@ -284,12 +258,7 @@ export default function Main(config={}){
         return handlerInstance
     }
     
-    start.resume = resume
-    start.start = function start(){
-        return start().start()
-    }
-    
-    return start
+    return resume
 }
 
 /**
