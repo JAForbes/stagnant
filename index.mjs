@@ -249,12 +249,14 @@ export default function Main(config={}){
 
         router.sync = routerSync
         router.activeTrace = function activeTrace(){
-            return lastTrace;
+            return lastTrace || parentEvent.activeTrace();
         }
         router.activeTraceId = function activeTrace(){
+            let lastTrace = router.activeTrace()
             return lastTrace && lastTrace.traceId;
         }
         router.activeSpanId = function activeTrace(){
+            let lastTrace = router.activeTrace()
             return lastTrace && lastTrace.id;
         }
         router.start = function startTrace(...args){
