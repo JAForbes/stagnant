@@ -96,8 +96,6 @@ export default function Main(config={}){
 
     function Instance(parentEvent){
 
-        let lastTrace = null;
-        
         function handler(...args){
             const callbackIndex = args.findIndex( x => typeof x == 'function' || isSequence(x) )
             let cb = args[callbackIndex]
@@ -129,7 +127,6 @@ export default function Main(config={}){
             
             try {
                 event.startTime = Date.now()
-                lastTrace = event
                 const out = await callback(childP)
                 event.endTime = Date.now()
                 return out
@@ -140,9 +137,6 @@ export default function Main(config={}){
             } finally {
                 dispatchEvent(event)
                     .catch( e => config.console.error('Failed to dispatch event', e))
-                if (lastTrace && lastTrace.id == event.id ) {
-                    lastTrace = null
-                }
             }
     
         }
@@ -150,7 +144,6 @@ export default function Main(config={}){
         function handlerSync({ callback, name, event, childP }){
             try {
                 event.startTime = Date.now()
-                lastTrace = event
                 const out = callback(childP)
                 event.endTime = Date.now()
                 if( out != null && 'then' in out ) {
@@ -164,9 +157,6 @@ export default function Main(config={}){
             } finally {
                 dispatchEvent(event)
                     .catch( e => config.console.error('Failed to dispatch event', e))
-                if (lastTrace && lastTrace.id == event.id ) {
-                    lastTrace = null
-                }
             }
         }
 
@@ -178,7 +168,6 @@ export default function Main(config={}){
                     let it = callback(childP)
 
                     event.startTime = Date.now()
-                    lastTrace = event
                     let prev = {};
                     while ( true ) {
                         try {
@@ -200,9 +189,6 @@ export default function Main(config={}){
                 } finally {
                     dispatchEvent(event)
                         .catch( e => config.console.error('Failed to dispatch event', e))
-                    if (lastTrace && lastTrace.id == event.id ) {
-                        lastTrace = null
-                    }
                 }
             }
             
@@ -248,16 +234,11 @@ export default function Main(config={}){
         }
 
         router.sync = routerSync
-        router.activeTrace = function activeTrace(){
-            return lastTrace || parentEvent.activeTrace();
+        router.traceId = function traceId(){
+            return parentEvent.traceId
         }
-        router.activeTraceId = function activeTrace(){
-            let lastTrace = router.activeTrace()
-            return lastTrace && lastTrace.traceId;
-        }
-        router.activeSpanId = function activeTrace(){
-            let lastTrace = router.activeTrace()
-            return lastTrace && lastTrace.id;
+        router.id = function id(){
+            return parentEvent.id
         }
         router.start = function startTrace(...args){
             let finish

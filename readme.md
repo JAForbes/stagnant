@@ -407,6 +407,60 @@ Send the `parentId` and `traceId`to your API via a header, then when initializin
 
 See the [honeycomb implementation](./honeycomb.js) for ideas.
 
+### How do I get the activeTrace?
+
+In other tracing libraries, instrumentation is automatic and is quite complicated.  For example in honeycomb's Node.js beeline the async_hooks module is used to figure out whether an async function invocation belongs to another async call stack that is related to a given trace.
+
+Finding out the active trace in these libraries is a complex system that isn't foolproof.  It is possible to lose the active trace by nesting an async function, or using an iife, or any other range of behaviours async_hooks trips up on.
+
+
+In stagnant, all instrumentation is manual.  Because it is manual, you always have a reference to every trace, because you are the one that invoked the tracing function `I`.
+
+There is no ambiguity or complex system.  When you start a new span, you can know that any code that runs inside that block belongs to the span/trace.
+
+```js
+await I( 'example', async I => {
+    let traceId = I.traceId()
+    let id = I.id()
+})
+```
+
+If you want some api request, db query or other async task to belong to a trace, you need to pass that `I` reference around and wrap the given task in that reference.
+
+```js
+
+async function request(I, ...){
+    return I( () => fetch(...) )
+}
+
+await I( 'example', async I => {
+    let traceId = I.traceId()
+    let id = I.id()
+
+    const users = await request(I, 'https://example.com/api/users')
+})
+```
+
+If you just want requests to belong to the overall trace but not necessarily nested under the span that invoked the request, you can just use a different `I` reference. 
+
+```js
+await I( async I => {
+
+    async function request(...){
+        // accesses I via a closure
+        return I( () => fetch(...) )
+    }
+    
+    await I( 'example', async I => {
+        let traceId = I.traceId()
+        let id = I.id()
+    
+        // does not use the current I reference, uses the parent one
+        const users = await request('https://example.com/api/users')
+    })
+})
+```
+
 ## Honeycomb integration
 
 ![A visualization of a call graph as measured by stagnant using the honeycomb integration.](./assets/honeycomb-usage.png)
@@ -418,3 +472,4 @@ Stagnant can be used offline and with any 3rd party instrumentation toolkit you 
 So here we are.  I share with you the same integration just in case it is useful for to you.  But stagnant can be used as a standalone library just as easily.
 
 There is a simple [honeycomb](https://honeycomb.io) integration in [`stagnant/honeycomb.js`](./honeycomb.js).  Check out the [usage script](./honeycomb-usage.js) to set it up in your own project.
+
