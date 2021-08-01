@@ -365,7 +365,7 @@ When initializing honeycomb configuring stagnant options requires an outer key `
 
 There are several ways, but the easiest is to override `config.onevent`.
 
-You can simply replace config.onevent with a no-op function, but the events themselves are useful for testing, so you may instead want to replace onevent with a method that pushes traces into a list that you can examine from your tests.
+You can simply replace config.onevent with a no-op function, but the events themselves are useful for testing, so you may instead want to replace `onevent` with a method that pushes traces into a list that you can examine from your tests.
 
 ```js
 let events = []
@@ -386,6 +386,23 @@ test('Sign up email was sent', async t => {
 
     t.ok(event && event.response.status, 200)
 })
+```
+
+If you do not want the events in offline mode, you can also easily mock the stagnant API by passing `null` to `stagnant.ensure`.  This just returns a function that mimics a stagnant trace function, but doesn't actually do anything except execute the functions you pass in.
+
+Both approaches allow you to keep your traces in your live production code even if you want to temporarily disable them in certain contexts.
+
+```js
+
+let I = stagnant.ensure(null)
+
+I( 'trace', () => {
+    // hello is logged, but no traces recorded
+    console.log('hello')
+})
+
+// this metadata is ignored and discarded immediately
+I({ a:1, b: 2 })
 ```
 
 ### What is a trace vs a parent vs an event?
