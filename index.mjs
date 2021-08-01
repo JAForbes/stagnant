@@ -53,8 +53,8 @@ export default function Main(config={}){
 
     { // todo-james could have a deep merge maybe?
         let x = defaultConfig()
-        let y = { ...x.time, ...config.time||{} }
-        config = { ...x, ...config, ...y }
+        let time = Object.assign(x.time, config.time || {})
+        config = { ...x, ...config, time }
     }
 
     const { generateId } = config
