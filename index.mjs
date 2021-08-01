@@ -51,7 +51,11 @@ function defaultConfig(){
 
 export default function Main(config={}){
 
-    config = { ...defaultConfig(), ...config }
+    { // todo-james could have a deep merge maybe?
+        let x = defaultConfig()
+        let y = { ...x.time, ...config.time||{} }
+        config = { ...x, ...config, ...y }
+    }
 
     const { generateId } = config
 
@@ -281,14 +285,14 @@ export default function Main(config={}){
         async sync(){ 
             config.time.offset = await config.time.sync()
             return config.time
-        },
-        async clear(){ 
+        }
+        ,async clear(){ 
             return config.time.clear()
-        },
-        async save(...args){ 
+        }
+        ,async save(...args){ 
             return config.time.save(...args)
-        },
-        async restore(){ 
+        }
+        ,async restore(){ 
             return config.time.restore()
         }
     }
