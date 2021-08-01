@@ -44,7 +44,7 @@ function defaultConfig(){
         , fetch
         , time
         , now(){
-            return Date.now() - time.offset.avg 
+            return time.local()
         }
     }
 }
