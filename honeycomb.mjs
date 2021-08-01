@@ -14,7 +14,8 @@ export default function Main({
     async function onevent(event){
         const name = event.parentId ? event.name : rootName
         const body = JSON.stringify({
-            ...event.data
+            service_name: config.service_name || 'stagnant'
+            , ...event.data
             , ...data
             , name
             , error: event.error ? event.error.message : undefined
@@ -22,7 +23,6 @@ export default function Main({
             , 'trace.trace_id': 'trace-'+ event.traceId
             , 'trace.span_id': 'span-' + event.id
             , 'trace.parent_id': event.parentId ? 'span-' + event.parentId : parentId
-            , service_name: 'stagnant'
             , duration_ms: event.endTime - event.startTime
         })
 
