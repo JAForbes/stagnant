@@ -63,3 +63,6 @@ export default function Main({
 
     return root
 }
+
+Main.ensure = stagnant.ensure
+Main.call = stagnant.call
