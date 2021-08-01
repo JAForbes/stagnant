@@ -186,7 +186,7 @@ Initialize a trace.
 
 ### Stagnant.call
 
-`stagnant.call( trace?, ...args, () -> b ) -> b`
+`Stagnant.call( trace?, ...args, () -> b ) -> b`
 
 Safely invoke a trace callback even if the trace is null.  Fairly useful for writing wrappers around 3rd party libraries that may be invoked by code without a trace variable.
 
@@ -195,7 +195,7 @@ async function something(event){
 
     // instead of:
     // await event.trace( 'normal invocation style', () => db.query('select 1+1') )
-    await stagnant.call(event.trace, 'safer invocation style', () => db.query('select 1+1') )
+    await Stagnant.call(event.trace, 'safer invocation style', () => db.query('select 1+1') )
 }
 ```
 
@@ -203,13 +203,13 @@ async function something(event){
 
 > Stability: 💀 Unstable
 
-`trace = stagnant.ensure( trace? )`
+`trace = Stagnant.ensure( trace? )`
 
-Much like stagnant.call, but instead of immediately invoking the trace (if it exists), a mock trace is returned that will execute just fine but will not actually create any events or traces behind the scenes.
+Much like Stagnant.call, but instead of immediately invoking the trace (if it exists), a mock trace is returned that will execute just fine but will not actually create any events or traces behind the scenes.
 
 ```js
 async function something(event){
-    event.trace = stagnant.ensure(event.trace)
+    event.trace = Stagnant.ensure(event.trace)
 
     await event.trace( 'will work even if event.trace is null', () => db.query('select 1+1') )
 }
@@ -388,13 +388,13 @@ test('Sign up email was sent', async t => {
 })
 ```
 
-If you do not want the events in offline mode, you can also easily mock the stagnant API by passing `null` to `stagnant.ensure`.  This just returns a function that mimics a stagnant trace function, but doesn't actually do anything except execute the functions you pass in.
+If you do not want the events in offline mode, you can also easily mock the stagnant API by passing `null` to `Stagnant.ensure`.  This just returns a function that mimics a stagnant trace function, but doesn't actually do anything except execute the functions you pass in.
 
 Both approaches allow you to keep your traces in your live production code even if you want to temporarily disable them in certain contexts.
 
 ```js
 
-let I = stagnant.ensure(null)
+let I = Stagnant.ensure(null)
 
 I( 'trace', () => {
     // hello is logged, but no traces recorded
@@ -415,7 +415,7 @@ Short answer, you don't.
 
 Long answer, instead of directly calling the 3rd party library, call your own function that calls the library and time that.
 
-You can use `stagnant.call( trace, () => ...)` or `stagnant.ensure(trace)` instead of `trace( () => ... )` to safe guard against not having a trace variable.
+You can use `Stagnant.call( trace, () => ...)` or `Stagnant.ensure(trace)` instead of `trace( () => ... )` to safe guard against not having a trace variable.
 
 If the trace is undefined, `stagnant` will just invoke the callback without creating a trace.  That way you can write code that will behave just fine even if there is no trace variable passed down.  This also means you can disable tracing in your codebase without having to restructure your code beyond not passing down a trace at the entry point.
 
