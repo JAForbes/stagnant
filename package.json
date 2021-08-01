@@ -1,6 +1,6 @@
 {
   "name": "stagnant",
-  "version": "0.0.34-next.51",
+  "version": "0.0.34-next.52",
   "description": "A full stack, profiling & tracing toolkit.",
   "main": "index.cjs",
   "module": "index.mjs",
