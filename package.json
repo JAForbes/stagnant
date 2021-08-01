@@ -1,6 +1,6 @@
 {
   "name": "stagnant",
-  "version": "0.0.34-next.38",
+  "version": "0.0.34-next.39",
   "description": "",
   "main": "index.cjs",
   "module": "index.mjs",
