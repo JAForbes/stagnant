@@ -1,6 +1,6 @@
 {
   "name": "stagnant",
-  "version": "0.0.34-next.44",
+  "version": "0.0.34-next.45",
   "description": "A full stack, profiling & tracing toolkit.",
   "main": "index.cjs",
   "module": "index.mjs",
@@ -20,7 +20,12 @@
     "*.cjs"
   ],
   "keywords": [
-    "tracing", "profiling", "observability", "honeycomb", "browser", "server"
+    "tracing",
+    "profiling",
+    "observability",
+    "honeycomb",
+    "browser",
+    "server"
   ],
   "author": "",
   "license": "MIT",
