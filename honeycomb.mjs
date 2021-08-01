@@ -2,19 +2,25 @@
 import stagnant from './index.mjs'
 
 
-export default function Main({ 
+export default function Main({
     name: rootName='root'
+    , serviceName: rootServiceName='stagnant'
     , dataset='default'
     , writeKey=process.env.HONEYCOMB_WRITE_KEY
     , parentId= undefined
-    , data={} 
+    , data={}
     , config={}
 }={}){
 
     async function onevent(event){
-        const name = event.parentId ? event.name : rootName
+        const name = 
+            event.parentId ? event.name : rootName
+
+        const service_name = 
+            config.serviceName || event.serviceName || rootServiceName
+
         const body = JSON.stringify({
-            service_name: config.serviceName || event.serviceName || 'stagnant'
+            service_name
             , ...event.data
             , ...data
             , name
