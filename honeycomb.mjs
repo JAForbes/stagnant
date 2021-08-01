@@ -57,7 +57,7 @@ export default function Main({
     { // todo-james could have a deep merge maybe?
         let x = stagnant.defaultConfig()
         let time = Object.assign(x.time, config.time || {})
-        config = { ...x, ...config, time }
+        config = { ...x, onevent, ...config, time }
     }
     
     // Traces aren't nested, but a trace can contain nested spans.
