@@ -180,11 +180,15 @@ export default function Main(config={}){
                     while ( true ) {
                         try {
                             prev = it.next(prev.value)
-                            yield prev.value
+                            // give the original interpreter
+                            // a chance to replace what was yielded
+                            prev.value = yield prev.value
                             if( prev.done ) break;
                         } catch (e) {
                             prev = it.throw(e)
-                            yield prev.value
+                            // give the original interpreter
+                            // a chance to replace what was yielded
+                            prev.value = yield prev.value
                             if( prev.done ) break;
                         }
                     }
