@@ -261,8 +261,8 @@ export default function Main(config={}){
         Object.assign(rootEvent, theirEvent)
         
         let handlerInstance = Instance(rootEvent)
-        handlerInstance.flush = function(){}
         handlerInstance.config = config
+        handlerInstance.flush = rootEvent.flush
         return handlerInstance
     }
     
