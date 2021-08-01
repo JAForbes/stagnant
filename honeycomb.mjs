@@ -14,7 +14,7 @@ export default function Main({
     async function onevent(event){
         const name = event.parentId ? event.name : rootName
         const body = JSON.stringify({
-            service_name: config.serviceName || 'stagnant'
+            service_name: config.serviceName || event.serviceName || 'stagnant'
             , ...event.data
             , ...data
             , name
