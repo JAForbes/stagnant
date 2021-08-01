@@ -57,8 +57,11 @@ function Time(options={}){
         ,async clear(){
             if ( typeof localStorage == 'undefined' ) return false;
             
-            return localStorage.removeItem('stagnant.time.offset')
-                && localStorage.removeItem('stagnant.time.expiry')
+            localStorage.removeItem('stagnant.time.offset')
+            && localStorage.removeItem('stagnant.time.expiry')
+
+            time.offset = { avg: 0, min: 0, max: 0 }
+            return true
         }
         ,async restore(){
             if ( typeof localStorage == 'undefined' ) return false;
@@ -91,8 +94,11 @@ function Time(options={}){
         ,async server(){
             return Date.now()
         }
-        ,local(offset=time.offset){
-            return Date.now() - offset.avg
+        ,local(){
+            return Date.now()
+        }
+        ,now(offset=time.offset){
+            return offset=time.offset - offset.avg
         }
         ,async sync(){
             

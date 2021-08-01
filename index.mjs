@@ -44,7 +44,7 @@ function defaultConfig(){
         , fetch
         , time
         , now(){
-            return time.local()
+            return time.now()
         }
     }
 }
