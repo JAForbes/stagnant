@@ -361,6 +361,33 @@ When initializing honeycomb configuring stagnant options requires an outer key `
 
 ## FAQ
 
+### How do I disable stagnant when testing offline?
+
+There are several ways, but the easiest is to override `config.onevent`.
+
+You can simply replace config.onevent with a no-op function, but the events themselves are useful for testing, so you may instead want to replace onevent with a method that pushes traces into a list that you can examine from your tests.
+
+```js
+let events = []
+let stagnant = Stagnant({
+    onevent(event){
+        events.push(event)
+    },
+    onflush(){
+        events.length = []
+    }
+})
+
+test('Sign up email was sent', async t => {
+    await callApi()
+
+    let event = events.find( x => x.name == 'sendEmail' )
+    t.ok(event)
+
+    t.ok(event && event.response.status, 200)
+})
+```
+
 ### What is a trace vs a parent vs an event?
 
 A trace is simply a group of events.  All events sharing the same trace_id are considered part of that trace.  Theoretically you could infer a relationship between events by following the tree of parent/child events.  But if you set only the parentId and not the traceId, tools like honeycomb will get confused.

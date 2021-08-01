@@ -1,5 +1,4 @@
 /* globals process */
-import fetch from 'node-fetch'
 import stagnant from './index.mjs'
 
 
@@ -13,7 +12,7 @@ export default function Main({
 }={}){
 
     config = { ...stagnant.defaultConfig(), ...config }
-    delete config.onevent
+    
     // Traces aren't nested, but a trace can contain nested spans.
     // We create a root trace for every invocation of Honey
     // every other event subsequently is a span within that root trace
@@ -36,7 +35,7 @@ export default function Main({
             try {
 
                 // console.log(name, event.error, event.endTime - event.startTime)
-                const response = await fetch(`https://api.honeycomb.io/1/events/${dataset}`, {
+                const response = await config.fetch(`https://api.honeycomb.io/1/events/${dataset}`, {
                     method: 'post'
                     ,headers: {
                         'X-Honeycomb-Team': writeKey

@@ -1,3 +1,5 @@
+import fetch from 'node-fetch'
+
 let generatorProto = Object.getPrototypeOf(function * (){})
 
 let isSequence = x =>
@@ -30,7 +32,13 @@ function defaultConfig(){
     }
 
     return { 
-        onevent, onerror, onsuccess, onflush, console: ourConsole, generateId 
+        onevent
+        , onerror
+        , onsuccess
+        , onflush
+        , console: ourConsole
+        , generateId 
+        , fetch
     }
 }
 
