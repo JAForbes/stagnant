@@ -1,6 +1,6 @@
 # stagnant
 
-Measure your slow code, make it _fast_.
+A full stack, profiling & tracing toolkit.
 
 ## What
 
@@ -507,6 +507,19 @@ await I( async I => {
     })
 })
 ```
+
+## How do I synhronize my time from client to server?
+
+All times recorded are using the JS engines unix timestamp: `Date.now()`.  So timezones aren't a problem.  But we cannot assume that a browser or a server clock is set correctly.  
+
+The browser's clock will usually be set to whatever the OS system clock is set to.  If the browser is 50ms behind the real time for whatever reason, you will see weird results in your trace viewer.
+You might see requests initiating client side after the response has already been sent server side, and vice versa.
+
+This isn't an easy problem to solve perfectly, but it is fairly easy to solve if we decide we can trust the client drift is not intentional, is constant, and allow the client to be authoritative.
+We first need to make a call to the server asking it what it thinks the time is.  The server responds with what it thinks the current time is.  We measure how long the request takes to resolve, and add that to the time we sent the request.
+
+We then subtract that time from the server time we got back in the response.  The remainder will be the amount of positive or negative delay between server and client.
+We can then override `config.now` on the client to add that delay so all client recorded events are offset to the server time.
 
 ## Honeycomb integration
 

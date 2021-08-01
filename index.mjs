@@ -31,6 +31,10 @@ function defaultConfig(){
         return Math.random().toString(15).slice(2,8)
     }
 
+    function now(){
+        return Date.now()
+    }
+
     return { 
         onevent
         , onerror
@@ -39,6 +43,7 @@ function defaultConfig(){
         , console: ourConsole
         , generateId 
         , fetch
+        , now
     }
 }
 
@@ -68,15 +73,15 @@ export default function Main(config={}){
             parentId: null
             ,id: generateId()
             ,traceId
-            ,startTime: Date.now()
-            ,endTime: Date.now()
+            ,startTime: config.now()
+            ,endTime: config.now()
             ,error: null
             ,data: {}
         })
 
         event.flush = async function flush(){
             delete event.flush
-            event.endTime = Date.now()
+            event.endTime = config.now()
             await dispatchEvent(event)
             await config.onflush(event)
             return event
@@ -134,12 +139,12 @@ export default function Main(config={}){
             }
             
             try {
-                event.startTime = Date.now()
+                event.startTime = config.now()
                 const out = await callback(childP)
-                event.endTime = Date.now()
+                event.endTime = config.now()
                 return out
             } catch (e) {
-                event.endTime = Date.now()
+                event.endTime = config.now()
                 event.error = e
                 throw e
             } finally {
@@ -151,15 +156,15 @@ export default function Main(config={}){
 
         function handlerSync({ callback, name, event, childP }){
             try {
-                event.startTime = Date.now()
+                event.startTime = config.now()
                 const out = callback(childP)
-                event.endTime = Date.now()
+                event.endTime = config.now()
                 if( out != null && 'then' in out ) {
                     config.console.warn(name, 'A call to trace.sync was made but the response was async.  This is likely a mistake and should be corrected.')
                 }
                 return out
             } catch (e) {
-                event.endTime = Date.now()
+                event.endTime = config.now()
                 event.error = e
                 throw e
             } finally {
@@ -175,7 +180,7 @@ export default function Main(config={}){
                 try {
                     let it = callback(childP)
 
-                    event.startTime = Date.now()
+                    event.startTime = config.now()
                     let prev = {};
                     while ( true ) {
                         try {
@@ -192,10 +197,10 @@ export default function Main(config={}){
                             if( prev.done ) break;
                         }
                     }
-                    event.endTime = Date.now()
+                    event.endTime = config.now()
                     return prev.value
                 } catch (e) {
-                    event.endTime = Date.now()
+                    event.endTime = config.now()
                     event.error = e
                     throw e
                 } finally {
