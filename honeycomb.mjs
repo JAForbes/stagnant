@@ -54,7 +54,11 @@ export default function Main({
 
     }
 
-    config = { ...stagnant.defaultConfig(), onevent, ...config }
+    { // todo-james could have a deep merge maybe?
+        let x = stagnant.defaultConfig()
+        let time = Object.assign(x.time, config.time || {})
+        config = { ...x, ...config, time }
+    }
     
     // Traces aren't nested, but a trace can contain nested spans.
     // We create a root trace for every invocation of Honey
