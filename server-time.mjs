@@ -110,10 +110,4 @@ function Time(options={}){
     return time
 }
 
-var t = Time({
-    server: () => fetch(process.env.HARTH_API_URL+'/time').then( r => r.json() ).then( x => x.value )
-})
-
-await t.sync()
-
 export default Time
