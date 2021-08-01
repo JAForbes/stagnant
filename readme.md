@@ -447,7 +447,10 @@ For application profiling, no, the delay will be neglible.  For something low le
 
 ### How do I continue a trace across multiple servers or contexts?
 
-Send the `parentId` and `traceId`to your API via a header, then when initializing stagnant serverside call `let I = I.resume({ id: parentId, traceId })`. 
+Send the `parentId` and `traceId` to your API via a header, then when when kicking off a trace pass in those ids `let I = stagnant({ parentId, traceId })`. 
+
+They will be merged into the root event.  Usually the rootEvent has a null parentId and the traceId is generated on initialization.  But by passing them in
+this rootEvent will become a child event of an existing trace.
 
 See the [honeycomb implementation](./honeycomb.js) for ideas.
 
