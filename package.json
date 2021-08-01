@@ -16,6 +16,7 @@
     "dist/*",
     "index.mjs",
     "index.cjs",
+    "server-time.mjs",
     "honeycomb.mjs",
     "*.cjs"
   ],

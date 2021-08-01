@@ -1,4 +1,5 @@
 import fetch from 'node-fetch'
+import Time from './server-time'
 
 let generatorProto = Object.getPrototypeOf(function * (){})
 
@@ -31,9 +32,7 @@ function defaultConfig(){
         return Math.random().toString(15).slice(2,8)
     }
 
-    function now(){
-        return Date.now()
-    }
+    let time = Time()
 
     return { 
         onevent
@@ -43,7 +42,10 @@ function defaultConfig(){
         , console: ourConsole
         , generateId 
         , fetch
-        , now
+        , time
+        , now(){
+            return Date.now() - time.offset.avg 
+        }
     }
 }
 
@@ -275,6 +277,12 @@ export default function Main(config={}){
         return handlerInstance
     }
     
+    resume.time = { 
+        async sync(){ 
+            config.time.offset = await config.time.sync()
+            return config.time
+        }
+    }
     return resume
 }
 
