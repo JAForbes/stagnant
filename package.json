@@ -1,13 +1,13 @@
 {
   "name": "stagnant",
-  "version": "0.0.33",
-  "description": "",
+  "version": "0.0.34-next.52",
+  "description": "A full stack, profiling & tracing toolkit.",
   "main": "index.cjs",
   "module": "index.mjs",
   "browser": "dist/stagnant.browser.min.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepublish": "rollup -c rollup.config.mjs"
+    "prepare": "rollup -c rollup.config.mjs"
   },
   "engines": {
     "node": ">=14.0.0"
@@ -16,8 +16,17 @@
     "dist/*",
     "index.mjs",
     "index.cjs",
+    "server-time.mjs",
     "honeycomb.mjs",
     "*.cjs"
+  ],
+  "keywords": [
+    "tracing",
+    "profiling",
+    "observability",
+    "honeycomb",
+    "browser",
+    "server"
   ],
   "author": "",
   "license": "MIT",

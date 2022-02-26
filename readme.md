@@ -1,6 +1,6 @@
 # stagnant
 
-Measure your slow code, make it _fast_.
+A full stack, profiling & tracing toolkit.
 
 ## What
 
@@ -47,7 +47,7 @@ Depending on your project structure node.js will either import the native ESM mo
 - npm install `stagnant`
 
 ```js
-import trace from 'stagnant'
+import Stagnant from 'stagnant'
 
 const traceOptions = {
     onevent({ id, name, data, parentId, startTime, endTime }){
@@ -64,22 +64,23 @@ const traceOptions = {
     // parentId
 }
 
+const stagnant = Stagnant(traceOptions)
 async function main(){
-    const span = trace(traceOptions)
+    const I = stagnant()
 
     const package = 
-        await span( () => fs.promises.readFile('package.json', 'utf8') )
+        await I( () => fs.promises.readFile('package.json', 'utf8') )
 
     const files = 
-        await span( 'ls', () => fs.promises.readdir('.') )
+        await I( 'ls', () => fs.promises.readdir('.') )
 
     for( let file of files ) {
-        const filedata = span.sync( 'read file: ' + file,  () =>
+        const filedata = I.sync( 'read file: ' + file,  () =>
             fs.readFileSync(file)
         )
     }
     
-    await span.flush()
+    await I.flush()
 }
 ```
 
@@ -88,7 +89,7 @@ async function main(){
 
 ```js
 
-import stagnant from 'stagnant'
+import Stagnant from 'stagnant'
 
 async function main(trace){
 
@@ -163,7 +164,8 @@ const options = {
     }
 }
 
-const trace = stagnant(options)
+const stagnant = Stagnant(options)
+const trace = stagnant()
 
 main(trace).finally( () => {
     // all events ready to inspect
@@ -176,14 +178,15 @@ main(trace).finally( () => {
 
 ## API
 
-### stagnant
+### Stagnant
 
-`stagnant(options: stagnant.Options ) -> Trace`
+`Stagnant(options: stagnant.Options ) -> StagnantInstance
 
 Initialize a trace.
-### stagnant.call
 
-`stagnant.call( trace?, ...args, () -> b ) -> b`
+### Stagnant.call
+
+`Stagnant.call( trace?, ...args, () -> b ) -> b`
 
 Safely invoke a trace callback even if the trace is null.  Fairly useful for writing wrappers around 3rd party libraries that may be invoked by code without a trace variable.
 
@@ -192,39 +195,41 @@ async function something(event){
 
     // instead of:
     // await event.trace( 'normal invocation style', () => db.query('select 1+1') )
-    await stagnant.call(event.trace, 'safer invocation style', () => db.query('select 1+1') )
+    await Stagnant.call(event.trace, 'safer invocation style', () => db.query('select 1+1') )
 }
 ```
 
-
-### stagnant.ensure
+### Stagnant.ensure
 
 > Stability: 💀 Unstable
 
-`trace = stagnant.ensure( trace? )`
+`trace = Stagnant.ensure( trace? )`
 
-Much like stagnant.call, but instead of immediately invoking the trace (if it exists), a mock trace is returned that will execute just fine but will not actually create any events or traces behind the scenes.
+Much like Stagnant.call, but instead of immediately invoking the trace (if it exists), a mock trace is returned that will execute just fine but will not actually create any events or traces behind the scenes.
 
 ```js
 async function something(event){
-    event.trace = stagnant.ensure(event.trace)
+    event.trace = Stagnant.ensure(event.trace)
 
     await event.trace( 'will work even if event.trace is null', () => db.query('select 1+1') )
 }
 ```
 
-### Trace
+### stagnant
 
 `Trace` is often aliased as `I` (for _instrument_).  Usually you invoke trace with a callback.  stagnant
-will time how long it takes for a promise returned from that callback to settle.
+will time how long it takes for a promise/generator/iterator/async function to settle.
 
 ```js
-const I = stagnant(options)
+const stagnant = Stagnant(options)
+
+// starts a new trace
+let I = stagnant()
 
 let output = await I( () => myAsyncFunction() )
 ```
 
-You can also measure a synchronous function
+You can also measure a synchronous function via `I.sync`
 
 ```js
 let output = I.sync( () => mySynchronousFunction() )
@@ -323,6 +328,9 @@ Dispatched `.flush()` is called on the root trace.  Calling `flush` implies the 
     // reference to the parent event
     , parent: Trace
 
+    // id of the current trace
+    , traceId
+
     // id of the current event 
     , id: string
 
@@ -353,21 +361,70 @@ When initializing honeycomb configuring stagnant options requires an outer key `
 
 ## FAQ
 
+### How do I disable stagnant when testing offline?
+
+There are several ways, but the easiest is to override `config.onevent`.
+
+You can simply replace config.onevent with a no-op function, but the events themselves are useful for testing, so you may instead want to replace `onevent` with a method that pushes traces into a list that you can examine from your tests.
+
+```js
+let events = []
+let stagnant = Stagnant({
+    onevent(event){
+        events.push(event)
+    },
+    onflush(){
+        events.length = []
+    }
+})
+
+test('Sign up email was sent', async t => {
+    await callApi()
+
+    let event = events.find( x => x.name == 'sendEmail' )
+    t.ok(event)
+
+    t.ok(event && event.response.status, 200)
+})
+```
+
+If you do not want the events in offline mode, you can also easily mock the stagnant API by passing `null` to `Stagnant.ensure`.  This just returns a function that mimics a stagnant trace function, but doesn't actually do anything except execute the functions you pass in.
+
+Both approaches allow you to keep your traces in your live production code even if you want to temporarily disable them in certain contexts.
+
+```js
+
+let I = Stagnant.ensure(null)
+
+I( 'trace', () => {
+    // hello is logged, but no traces recorded
+    console.log('hello')
+})
+
+// this metadata is ignored and discarded immediately
+I({ a:1, b: 2 })
+```
+
+### What is a trace vs a parent vs an event?
+
+A trace is simply a group of events.  All events sharing the same trace_id are considered part of that trace.  Theoretically you could infer a relationship between events by following the tree of parent/child events.  But if you set only the parentId and not the traceId, tools like honeycomb will get confused.
+
 ### How do I instrument 3rd party libraries if everything is explicit?
 
 Short answer, you don't.  
 
 Long answer, instead of directly calling the 3rd party library, call your own function that calls the library and time that.
 
-You can use `stagnant.call( trace, () => ...)` or `stagnant.ensure(trace)` instead of `trace( () => ... )` to safe guard against not having a trace variable.
+You can use `Stagnant.call( trace, () => ...)` or `Stagnant.ensure(trace)` instead of `trace( () => ... )` to safe guard against not having a trace variable.
 
 If the trace is undefined, `stagnant` will just invoke the callback without creating a trace.  That way you can write code that will behave just fine even if there is no trace variable passed down.  This also means you can disable tracing in your codebase without having to restructure your code beyond not passing down a trace at the entry point.
 
 ```js
-const stagnant = require('stagnant')
+const Stagnant = require('stagnant')
 
-function query(query, values, p=null){
-    const results = await stagnant.call(p, () => db.query(query,values))
+function query(query, values, I=null){
+    I = Stagnant.ensure(I)
+    const results = await I(() => db.query(query,values))
     return results
 }
 
@@ -375,7 +432,7 @@ function query(query, values, p=null){
 await query('select * from users where user_id = ? ', [1], null)
 
 // this will perform a span within the active trace
-await query('select * from users where user_id = ? ', [1], p)
+await query('select * from users where user_id = ? ', [1], I)
 ```
 
 ### Why use callbacks for everything
@@ -386,13 +443,71 @@ It is a sensible default.
 
 ### But won't using anonymous functions introduce signifcantly delays?
 
-All signs point to no.
+For application profiling, no, the delay will be neglible.  For something low level like a virtual dom diffing algorithm, maybe.
 
 ### How do I continue a trace across multiple servers or contexts?
 
-In your `onevent` callback, pass in your own `parentId` or `traceId` from a previous request.  When stagnant creates what it thinks is the root trace, it will leave the `parentId` property null.  You can use that fact to conditionally add a different `parentId` from a previous request.
+Send the `parentId` and `traceId` to your API via a header, then when when kicking off a trace pass in those ids `let I = stagnant({ parentId, traceId })`. 
+
+They will be merged into the root event.  Usually the rootEvent has a null parentId and the traceId is generated on initialization.  But by passing them in
+this rootEvent will become a child event of an existing trace.
 
 See the [honeycomb implementation](./honeycomb.js) for ideas.
+
+### How do I get the activeTrace?
+
+In other tracing libraries, instrumentation is automatic and is quite complicated.  For example in honeycomb's Node.js beeline the async_hooks module is used to figure out whether an async function invocation belongs to another async call stack that is related to a given trace.
+
+Finding out the active trace in these libraries is a complex system that isn't foolproof.  It is possible to lose the active trace by nesting an async function, or using an iife, or any other range of behaviours async_hooks trips up on.
+
+
+In stagnant, all instrumentation is manual.  Because it is manual, you always have a reference to every trace, because you are the one that invoked the tracing function `I`.
+
+There is no ambiguity or complex system.  When you start a new span, you can know that any code that runs inside that block belongs to the span/trace.
+
+```js
+await I( 'example', async I => {
+    let traceId = I.traceId()
+    let id = I.id()
+})
+```
+
+If you want some api request, db query or other async task to belong to a trace, you need to pass that `I` reference around and wrap the given task in that reference.
+
+```js
+
+async function request(I, ...){
+    return I( () => fetch(...) )
+}
+
+await I( 'example', async I => {
+    let traceId = I.traceId()
+    let id = I.id()
+
+    const users = await request(I, 'https://example.com/api/users')
+})
+```
+
+If you just want requests to belong to the overall trace but not necessarily nested under the span that invoked the request, you can just use a different `I` reference. 
+
+```js
+await I( async I => {
+
+    async function request(...){
+        // accesses I via a closure
+        return I( () => fetch(...) )
+    }
+    
+    await I( 'example', async I => {
+        let traceId = I.traceId()
+        let id = I.id()
+    
+        // does not use the current I reference, uses the parent one
+        const users = await request('https://example.com/api/users')
+    })
+})
+```
+
 
 ## Honeycomb integration
 
@@ -404,4 +519,5 @@ Stagnant can be used offline and with any 3rd party instrumentation toolkit you 
 
 So here we are.  I share with you the same integration just in case it is useful for to you.  But stagnant can be used as a standalone library just as easily.
 
-There is a simple [honeycomb](https://honeycomb.io) integration in [`stagnant/honeycomb.js`](./honeycomb.js).  Check out the [usage script](./honeycomb-usage.js) to set it up in your own project.
+There is a simple [honeycomb](https://honeycomb.io) integration in [`stagnant/honeycomb.mjs`](./honeycomb.mjs).  Check out the [usage script](./honeycomb-usage.mjs) to set it up in your own project.
+
